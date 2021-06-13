@@ -13,7 +13,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * 对象去覆盖 {@link org.apache.ibatis.mapping.MappedStatement} 原有的
  * {@link org.apache.ibatis.mapping.ResultMap} 对象
  *
- * <p>请确保 {@link AutoResultMap} 使用于查询接口，且返回值为一个POJO对象或Collection<POJO>
+ * <p>请确保 {@link AutoResultMap} 使用于查询接口，且返回值为一个POJO对象或{@link java.util.Collection<POJO>}
  * 不然将无法生成 {@link org.apache.ibatis.mapping.ResultMap} 对象
  *
  * @author zhangguangyong
