@@ -1,16 +1,12 @@
 package com.github.freegeese.easymybatis.interceptor;
 
 import com.github.freegeese.easymybatis.domain.Dateable;
-import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 记录创建时间和修改时间拦截器
@@ -29,14 +25,14 @@ public class DateableInterceptor implements Interceptor {
     public Object intercept(Invocation invocation) throws Throwable {
         Object[] args = invocation.getArgs();
         MappedStatement mappedStatement = (MappedStatement) args[0];
-        MapperMethod.ParamMap<?> paramMap = (MapperMethod.ParamMap<?>) args[1];
+        Object param = args[1];
 
         SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
         Date now = new Date();
 
         // 设置创建时间
         if (sqlCommandType == SqlCommandType.INSERT) {
-            Object param1 = paramMap.get("param1");
+            Object param1 = Map.class.isAssignableFrom(param.getClass()) ? ((Map) param).get("param1") : param;
             if (Collection.class.isAssignableFrom(param1.getClass())) {
                 Collection<?> items = (Collection<?>) param1;
                 for (Object item : items) {
@@ -52,7 +48,7 @@ public class DateableInterceptor implements Interceptor {
 
         // 设置更新时间
         if (sqlCommandType == SqlCommandType.UPDATE) {
-            Object param1 = paramMap.get("param1");
+            Object param1 = Map.class.isAssignableFrom(param.getClass()) ? ((Map) param).get("param1") : param;
             if (Collection.class.isAssignableFrom(param1.getClass())) {
                 Collection<?> items = (Collection<?>) param1;
                 for (Object item : items) {

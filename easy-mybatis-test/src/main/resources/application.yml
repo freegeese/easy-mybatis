@@ -20,6 +20,6 @@ logging:
 
 datasource:
   test:
-    url: jdbc:mysql://rm-hp3u6q3sj8l5hxpy87m.mysql.huhehaote.rds.aliyuncs.com:3306/test?useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true
-    username: zodiac
-    password: 5ISxX7u4V#4wg*hr
+    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true
+    username: root
+    password: 123456
