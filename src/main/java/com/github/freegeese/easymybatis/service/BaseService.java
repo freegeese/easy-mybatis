@@ -4,6 +4,7 @@ import com.github.freegeese.easymybatis.domain.Pageable;
 import com.github.freegeese.easymybatis.mapper.BaseMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
@@ -21,12 +22,12 @@ import java.util.Map;
  * @since 1.0
  */
 public class BaseService<T, M extends BaseMapper<T>> {
-    protected final M mapper;
+    @Autowired
+    protected M mapper;
 
     protected final Class<T> entityClass;
 
-    public BaseService(M mapper) {
-        this.mapper = mapper;
+    public BaseService() {
         ParameterizedType parameterizedType = (ParameterizedType) getClass().getGenericSuperclass();
         this.entityClass = (Class<T>) parameterizedType.getActualTypeArguments()[0];
     }

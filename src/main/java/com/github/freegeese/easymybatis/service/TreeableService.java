@@ -22,11 +22,6 @@ import java.util.stream.Collectors;
 public abstract class TreeableService<T extends Treeable<ID>, M extends TreeableMapper<T, ID>, ID> extends BaseService<T, M> {
     private static final String PATH_SEPARATOR = "/";
 
-    public TreeableService(M mapper) {
-        super(mapper);
-    }
-
-
     @Override
     public int insert(T entity) {
         beforeInsert(entity);
