@@ -5,7 +5,6 @@
   <artifactId>easy-mybatis</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
-  <name>Easy Mybatis</name>
   <url>https://github.com/freegeese/easy-mybatis</url>
   <description>让MyBatis简单</description>
 
@@ -58,7 +57,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
-      <version>5.3.8</version>
+      <version>5.3.7</version>
     </dependency>
 
 
