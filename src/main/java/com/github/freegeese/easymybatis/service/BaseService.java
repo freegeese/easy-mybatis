@@ -109,11 +109,11 @@ public class BaseService<T, M extends BaseMapper<T>> {
 
     // 查 =================================================================================
     public T selectByPrimaryKey(Object id) {
-        return mapper.selectByPrimaryKey(id, entityClass);
+        return mapper.selectByPrimaryKey(id);
     }
 
     public List<T> selectByPrimaryKeys(List<?> ids) {
-        return mapper.selectByPrimaryKeys(ids, entityClass);
+        return mapper.selectByPrimaryKeys(ids);
     }
 
     public List<T> selectByEntity(T entity) {
@@ -121,16 +121,16 @@ public class BaseService<T, M extends BaseMapper<T>> {
     }
 
     public List<T> selectByParameterMap(Map<String, Object> parameterMap) {
-        return mapper.selectByParameterMap(parameterMap, entityClass);
+        return mapper.selectByParameterMap(parameterMap);
     }
 
     public List<T> selectAll() {
-        return mapper.selectAll(entityClass);
+        return mapper.selectAll();
     }
 
     // 分页 =================================================================================
     public Pageable<T> selectPage(Pageable<T> page) {
-        return copyPageInfo(page, PageHelper.offsetPage(page.getOffset(), page.getPageSize()).doSelectPageInfo(() -> mapper.selectAll(entityClass)));
+        return copyPageInfo(page, PageHelper.offsetPage(page.getOffset(), page.getPageSize()).doSelectPageInfo(() -> mapper.selectAll()));
     }
 
     public Pageable<T> selectPageByEntity(Pageable<T> page, T entity) {
@@ -138,7 +138,7 @@ public class BaseService<T, M extends BaseMapper<T>> {
     }
 
     public Pageable<T> selectPageByParameterMap(Pageable<T> page, Map<String, Object> parameterMap) {
-        return copyPageInfo(page, PageHelper.offsetPage(page.getOffset(), page.getPageSize()).doSelectPageInfo(() -> mapper.selectByParameterMap(parameterMap, entityClass)));
+        return copyPageInfo(page, PageHelper.offsetPage(page.getOffset(), page.getPageSize()).doSelectPageInfo(() -> mapper.selectByParameterMap(parameterMap)));
     }
 
     private Pageable<T> copyPageInfo(Pageable<T> page, PageInfo<T> pageInfo) {

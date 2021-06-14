@@ -13,13 +13,13 @@ logging:
   level:
     root: info
     org.springframework.data: debug
-    com.nuochen: debug
+    com.github: debug
   file:
     path: logs
     name: ${spring.application.name}.log
 
 datasource:
   test:
-    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true
+    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true
     username: root
     password: 123456

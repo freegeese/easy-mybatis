@@ -4,6 +4,7 @@ import com.github.freegeese.easymybatis.meta.MetaCache;
 import com.github.freegeese.easymybatis.meta.MetaEntityClass;
 import com.github.freegeese.easymybatis.util.RefUtils;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.builder.annotation.ProviderContext;
 import org.apache.ibatis.jdbc.SQL;
 
 import java.util.List;
@@ -18,16 +19,15 @@ import java.util.stream.IntStream;
  * @author zhangguangyong
  * @since 1.0
  */
-public class SelectSqlProvider {
+public class SelectSqlProvider extends BaseSqlProvider {
     /**
      * 根据主键查询
      *
      * @param id
-     * @param entityClass
      * @return
      */
-    public String selectByPrimaryKey(@Param("id") Object id, @Param("entityClass") Class<?> entityClass) {
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(entityClass);
+    public String selectByPrimaryKey(Object id, ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
         MetaEntityClass.ResultMapping primaryKey = meta.getPrimaryKeyResultMapping();
         SQL sql = new SQL().SELECT(meta.getColumns()).FROM(meta.getTable()).WHERE(primaryKey.getColumn() + " = #{id}");
         return sql.toString();
@@ -37,11 +37,10 @@ public class SelectSqlProvider {
      * 根据多个主键查询
      *
      * @param ids
-     * @param entityClass
      * @return
      */
-    public String selectByPrimaryKeys(@Param("ids") List<?> ids, @Param("entityClass") Class<?> entityClass) {
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(entityClass);
+    public String selectByPrimaryKeys(@Param("ids") List<?> ids, ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
         MetaEntityClass.ResultMapping primaryKey = meta.getPrimaryKeyResultMapping();
         String condition = IntStream.range(0, ids.size()).mapToObj(v -> "#{ids[" + v + "]}").collect(Collectors.joining(","));
         SQL sql = new SQL().SELECT(meta.getColumns()).FROM(meta.getTable()).WHERE(primaryKey.getColumn() + " in (" + condition + ")");
@@ -72,11 +71,10 @@ public class SelectSqlProvider {
      * 根据参数查询
      *
      * @param parameterMap
-     * @param entityClass
      * @return
      */
-    public String selectByParameterMap(@Param("parameterMap") Map<String, Object> parameterMap, @Param("entityClass") Class<?> entityClass) {
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(entityClass);
+    public String selectByParameterMap(@Param("parameterMap") Map<String, Object> parameterMap, ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
         SQL sql = new SQL().SELECT(meta.getColumns()).FROM(meta.getTable());
         List<MetaEntityClass.ResultMapping> resultMappings = meta.getResultMappings();
 
@@ -92,11 +90,10 @@ public class SelectSqlProvider {
     /**
      * 查询所有
      *
-     * @param entityClass
      * @return
      */
-    public String selectAll(Class<?> entityClass) {
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(entityClass);
+    public String selectAll(ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
         SQL sql = new SQL().SELECT(meta.getColumns()).FROM(meta.getTable());
         return sql.toString();
     }

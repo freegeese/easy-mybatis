@@ -1,17 +1,23 @@
 package com.github.freegeese.easymybatis.test;
 
+import com.alibaba.fastjson.JSON;
 import com.github.freegeese.easymybatis.test.domain.User;
+import com.github.freegeese.easymybatis.test.mapper.UserMapper;
 import com.github.freegeese.easymybatis.test.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 @SpringBootTest
 class UserServiceTests {
     @Autowired
     UserService service;
+
+    @Autowired
+    UserMapper mapper;
 
     @Test
     void testInsert() {
@@ -25,5 +31,10 @@ class UserServiceTests {
     @Test
     void testSelectAll() {
         assert !service.selectAll().isEmpty();
+    }
+
+    @Test
+    void testSelectOne() {
+        System.out.println(JSON.toJSONString(mapper.selectByPrimaryKeys(Arrays.asList(1, 2, 3))));
     }
 }

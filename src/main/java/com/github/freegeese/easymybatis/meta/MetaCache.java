@@ -14,25 +14,40 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.0
  */
 public class MetaCache {
-    private static Map<Class<?>, MetaEntityClass> metaEntityClassCache = new ConcurrentHashMap<>();
+    private static Map<String, MetaEntityClass> metaEntityClassCache = new ConcurrentHashMap<>();
     private static Map<String, MetaMapperClass> metaMapperClassCache = new ConcurrentHashMap<>();
 
     public static MetaEntityClass getMetaEntityClass(Class<?> entityClass) {
-        if (metaEntityClassCache.containsKey(entityClass)) {
-            return metaEntityClassCache.get(entityClass);
+        String entityClassName = entityClass.getName();
+        if (metaEntityClassCache.containsKey(entityClassName)) {
+            return metaEntityClassCache.get(entityClassName);
         }
         MetaEntityClass metaEntityClass = MetaEntityClass.forClass(entityClass);
-        metaEntityClassCache.put(entityClass, metaEntityClass);
+        metaEntityClassCache.put(entityClassName, metaEntityClass);
         return metaEntityClass;
     }
 
+    public static MetaMapperClass getMetaMapperClass(Class<?> mapperClass) {
+        String mapperClassName = mapperClass.getName();
+        if (metaMapperClassCache.containsKey(mapperClassName)) {
+            return metaMapperClassCache.get(mapperClassName);
+        }
+        MetaMapperClass metaMapperClass = MetaMapperClass.forMapperClass(mapperClass);
+        metaMapperClassCache.put(mapperClassName, metaMapperClass);
+        return metaMapperClass;
+    }
+
     public static MetaMapperClass getMetaMapperClass(MappedStatement mappedStatement) {
-        String id = mappedStatement.getId();
-        if (metaMapperClassCache.containsKey(id)) {
-            return metaMapperClassCache.get(id);
+        String mapperClassName = toMapperClassName(mappedStatement.getId());
+        if (metaMapperClassCache.containsKey(mapperClassName)) {
+            return metaMapperClassCache.get(mapperClassName);
         }
         MetaMapperClass metaMapperClass = MetaMapperClass.forMappedStatement(mappedStatement);
-        metaMapperClassCache.put(id, metaMapperClass);
+        metaMapperClassCache.put(mapperClassName, metaMapperClass);
         return metaMapperClass;
+    }
+
+    private static String toMapperClassName(String mappedStatementId) {
+        return mappedStatementId.substring(0, mappedStatementId.lastIndexOf("."));
     }
 }

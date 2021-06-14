@@ -270,7 +270,7 @@ public abstract class TreeableService<T extends Treeable<ID>, M extends Treeable
      * @param entity
      */
     private void afterInsert(T entity) {
-        T parent = mapper.selectByPrimaryKey(entity.getParentId(), entityClass);
+        T parent = mapper.selectByPrimaryKey(entity.getParentId());
         if (Objects.nonNull(parent)) {
             // 获取新增节点的最后一个兄弟节点
             T lastSibling = mapper.selectLastSibling(entity);

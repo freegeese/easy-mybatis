@@ -22,17 +22,17 @@ public interface SelectMapper<T> {
 
     @SelectProvider(type = SelectSqlProvider.class, method = "selectByParameterMap")
     @AutoResultMap
-    List<T> selectByParameterMap(@Param("parameterMap") Map<String, Object> parameterMap, @Param("entityClass") Class<T> entityClass);
+    List<T> selectByParameterMap(Map<String, Object> parameterMap);
 
     @SelectProvider(type = SelectSqlProvider.class, method = "selectByPrimaryKey")
     @AutoResultMap
-    T selectByPrimaryKey(@Param("id") Object id, @Param("entityClass") Class<T> entityClass);
+    T selectByPrimaryKey(Object id);
 
     @SelectProvider(type = SelectSqlProvider.class, method = "selectByPrimaryKeys")
     @AutoResultMap
-    List<T> selectByPrimaryKeys(@Param("ids") List<?> id, @Param("entityClass") Class<T> entityClass);
+    List<T> selectByPrimaryKeys(@Param("ids") List<?> ids);
 
     @SelectProvider(type = SelectSqlProvider.class, method = "selectAll")
     @AutoResultMap
-    List<T> selectAll(Class<T> entityClass);
+    List<T> selectAll();
 }
