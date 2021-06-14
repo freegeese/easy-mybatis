@@ -221,5 +221,5 @@ public interface TreeableMapper<T extends Treeable<ID>, ID> extends BaseMapper<T
      */
     @SelectProvider(type = TreeableSqlProvider.class, method = "selectRoot")
     @AutoResultMap
-    List<T> selectRoot(Class<T> entityClass);
+    List<T> selectRoot();
 }

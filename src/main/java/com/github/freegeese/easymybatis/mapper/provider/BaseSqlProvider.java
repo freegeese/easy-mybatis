@@ -27,6 +27,5 @@ public class BaseSqlProvider {
      */
     public MetaMapperClass getMetaMapperClass(ProviderContext context) {
         return MetaCache.getMetaMapperClass(context.getMapperType());
-
     }
 }

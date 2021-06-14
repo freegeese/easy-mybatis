@@ -1,9 +1,9 @@
 package com.github.freegeese.easymybatis.mapper.provider;
 
 import com.github.freegeese.easymybatis.domain.Treeable;
-import com.github.freegeese.easymybatis.meta.MetaCache;
 import com.github.freegeese.easymybatis.meta.MetaEntityClass;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.builder.annotation.ProviderContext;
 import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
@@ -17,7 +17,7 @@ import java.util.stream.Stream;
  * @author zhangguangyong
  * @since 1.0
  */
-public class TreeableSqlProvider {
+public class TreeableSqlProvider extends BaseSqlProvider {
     private static final String EMPTY_SQL = "";
 
     /**
@@ -27,12 +27,12 @@ public class TreeableSqlProvider {
      * @param target
      * @return
      */
-    public String exchange(@Param("source") Object source, @Param("target") Object target) {
+    public String exchange(@Param("source") Object source, @Param("target") Object target, ProviderContext context) {
         Treeable sourceNode = (Treeable) source;
         Treeable targetNode = (Treeable) target;
 
         if (sourceNode.getId() != targetNode.getId() && sourceNode.getParentId() == targetNode.getParentId()) {
-            MetaEntityClass meta = MetaCache.getMetaEntityClass(source.getClass());
+            MetaEntityClass meta = getMetaEntityClass(context);
             Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
             MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
@@ -55,11 +55,11 @@ public class TreeableSqlProvider {
      * @param to
      * @return
      */
-    public String move(@Param("from") Object from, @Param("to") Object to) {
+    public String move(@Param("from") Object from, @Param("to") Object to, ProviderContext context) {
         Treeable fromNode = (Treeable) from;
         Treeable toNode = (Treeable) to;
         if (fromNode.getId() != toNode.getId() && fromNode.getParentId() == toNode.getParentId()) {
-            MetaEntityClass meta = MetaCache.getMetaEntityClass(from.getClass());
+            MetaEntityClass meta = getMetaEntityClass(context);
             Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
             MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
@@ -98,8 +98,8 @@ public class TreeableSqlProvider {
      * @param target
      * @return
      */
-    public String selectPreviousSibling(Object target) {
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(target.getClass());
+    public String selectPreviousSibling(Object target, ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
         Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
@@ -118,8 +118,8 @@ public class TreeableSqlProvider {
      * @param target
      * @return
      */
-    public String selectNextSibling(Object target) {
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(target.getClass());
+    public String selectNextSibling(Object target, ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
         Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
@@ -138,8 +138,8 @@ public class TreeableSqlProvider {
      * @param target
      * @return
      */
-    public String selectFirstSibling(Object target) {
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(target.getClass());
+    public String selectFirstSibling(Object target, ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
         Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
@@ -158,8 +158,8 @@ public class TreeableSqlProvider {
      * @param target
      * @return
      */
-    public String selectLastSibling(Object target) {
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(target.getClass());
+    public String selectLastSibling(Object target, ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
         Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
@@ -175,11 +175,10 @@ public class TreeableSqlProvider {
     /**
      * 查询所有父节点
      *
-     * @param entityClass
      * @return
      */
-    public String selectParents(Class<?> entityClass) {
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(entityClass);
+    public String selectParents(ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
         Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
@@ -199,8 +198,8 @@ public class TreeableSqlProvider {
      * @param deep
      * @return
      */
-    public String selectChildren(@Param("target") Objects target, @Param("deep") boolean deep) {
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(target.getClass());
+    public String selectChildren(@Param("target") Objects target, @Param("deep") boolean deep, ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
         Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
@@ -224,8 +223,8 @@ public class TreeableSqlProvider {
      * @param oldPath
      * @return
      */
-    public String updateChildrenPath(@Param("target") Object target, @Param("oldPath") String oldPath) {
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(target.getClass());
+    public String updateChildrenPath(@Param("target") Object target, @Param("oldPath") String oldPath, ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
         Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
@@ -242,11 +241,10 @@ public class TreeableSqlProvider {
     /**
      * 查询根节点
      *
-     * @param entityClass
      * @return
      */
-    public String selectRoot(Class<?> entityClass) {
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(entityClass);
+    public String selectRoot(ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
         Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 

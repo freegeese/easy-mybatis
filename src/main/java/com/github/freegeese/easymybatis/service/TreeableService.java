@@ -97,7 +97,7 @@ public abstract class TreeableService<T extends Treeable<ID>, M extends Treeable
      * @return
      */
     public List<T> selectRoot() {
-        return mapper.selectRoot(entityClass);
+        return mapper.selectRoot();
     }
 
     /**

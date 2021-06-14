@@ -19,11 +19,11 @@ public interface DeleteMapper<T> {
     int deleteByEntity(T record);
 
     @DeleteProvider(type = DeleteSqlProvider.class, method = "deleteByParameterMap")
-    int deleteByParameterMap(@Param("parameterMap") Map<String, Object> parameterMap, @Param("entityClass") Class<T> entityClass);
+    int deleteByParameterMap(Map<String, Object> parameterMap);
 
     @DeleteProvider(type = DeleteSqlProvider.class, method = "deleteByPrimaryKey")
-    int deleteByPrimaryKey(@Param("id") Object id, @Param("entityClass") Class<T> entityClass);
+    int deleteByPrimaryKey(Object id);
 
     @DeleteProvider(type = DeleteSqlProvider.class, method = "deleteByPrimaryKeys")
-    int deleteByPrimaryKeys(@Param("ids") List<?> id, @Param("entityClass") Class<T> entityClass);
+    int deleteByPrimaryKeys(@Param("ids") List<?> id);
 }

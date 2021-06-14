@@ -6,7 +6,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Map;
 
@@ -24,13 +23,6 @@ import java.util.Map;
 public class BaseService<T, M extends BaseMapper<T>> {
     @Autowired
     protected M mapper;
-
-    protected final Class<T> entityClass;
-
-    public BaseService() {
-        ParameterizedType parameterizedType = (ParameterizedType) getClass().getGenericSuperclass();
-        this.entityClass = (Class<T>) parameterizedType.getActualTypeArguments()[0];
-    }
 
     // 增 =================================================================================
     public int insert(T entity) {
@@ -65,11 +57,11 @@ public class BaseService<T, M extends BaseMapper<T>> {
 
     // 删 =================================================================================
     public int deleteByPrimaryKey(Object id) {
-        return mapper.deleteByPrimaryKey(id, entityClass);
+        return mapper.deleteByPrimaryKey(id);
     }
 
     public int deleteByPrimaryKeys(List<?> ids) {
-        return mapper.deleteByPrimaryKeys(ids, entityClass);
+        return mapper.deleteByPrimaryKeys(ids);
     }
 
     public int deleteByEntity(T record) {
@@ -77,7 +69,7 @@ public class BaseService<T, M extends BaseMapper<T>> {
     }
 
     public int deleteByParameterMap(Map<String, Object> parameterMap) {
-        return mapper.deleteByParameterMap(parameterMap, entityClass);
+        return mapper.deleteByParameterMap(parameterMap);
     }
 
     // 改 =================================================================================

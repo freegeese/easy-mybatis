@@ -1,8 +1,8 @@
 package com.github.freegeese.easymybatis.mapper.provider;
 
-import com.github.freegeese.easymybatis.meta.MetaCache;
 import com.github.freegeese.easymybatis.meta.MetaEntityClass;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.builder.annotation.ProviderContext;
 import org.apache.ibatis.jdbc.AbstractSQL;
 import org.apache.ibatis.jdbc.SQL;
 
@@ -18,17 +18,16 @@ import java.util.stream.IntStream;
  * @author zhangguangyong
  * @since 1.0
  */
-public class InsertSqlProvider {
+public class InsertSqlProvider extends BaseSqlProvider {
     /**
      * 插入单个
      *
      * @param entity
      * @return
      */
-    public String insert(Object entity) {
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(entity.getClass());
-        List<MetaEntityClass.ResultMapping> resultMappings = meta.getResultMappingsWithoutAutoAndNull(entity);
-        return insertSql(meta, resultMappings);
+    public String insert(Object entity, ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
+        return insertSql(meta, meta.getResultMappingsWithoutAutoAndNull(entity));
     }
 
     /**
@@ -37,10 +36,9 @@ public class InsertSqlProvider {
      * @param entity
      * @return
      */
-    public String insertSelective(Object entity) {
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(entity.getClass());
-        List<MetaEntityClass.ResultMapping> resultMappings = meta.getResultMappingsWithoutNull(entity);
-        return insertSql(meta, resultMappings);
+    public String insertSelective(Object entity, ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
+        return insertSql(meta, meta.getResultMappingsWithoutNull(entity));
     }
 
     private String insertSql(MetaEntityClass meta, List<MetaEntityClass.ResultMapping> resultMappings) {
@@ -56,9 +54,8 @@ public class InsertSqlProvider {
      * @param entities
      * @return
      */
-    public String insertBatch(@Param("entities") List<?> entities) {
-        Class<?> entityClass = entities.get(0).getClass();
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(entityClass);
+    public String insertBatch(@Param("entities") List<?> entities, ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
         List<MetaEntityClass.ResultMapping> resultMappings = meta.getResultMappingsWithoutAuto();
 
         String columns = resultMappings.stream().map(MetaEntityClass.ResultMapping::getColumn).collect(Collectors.joining(","));
@@ -79,9 +76,8 @@ public class InsertSqlProvider {
      * @param entities
      * @return
      */
-    public String insertBatchSelective(@Param("entities") List<?> entities) {
-        Class<?> entityClass = entities.get(0).getClass();
-        MetaEntityClass meta = MetaCache.getMetaEntityClass(entityClass);
+    public String insertBatchSelective(@Param("entities") List<?> entities, ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
         AtomicInteger index = new AtomicInteger(0);
 
         List<SQL> sqls = new ArrayList<>();
