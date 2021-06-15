@@ -9,8 +9,7 @@
  * 基础 TreeableService<T> 通用层级结构操作接口(增删改查节点)
 
 ## 使用
-[source,java,indent=0]
-----
+```java
     // 配置对象
     EasyMybatisConfiguration configuration = new EasyMybatisConfiguration();
     // java命名格式
@@ -19,7 +18,7 @@
     configuration.setDatabaseCaseFormat(CaseFormat.LOWER_UNDERSCORE);
     // 传入 SqlSessionFactory 进行初始化
     configuration.init(sqlSessionFactory);
-----
+```
 
 ## 文档
 
@@ -27,6 +26,7 @@
 
 ## Maven
 
+* 单独使用
 ```xml
 <dependency>
     <groupId>com.github.freegeese</groupId>
@@ -35,3 +35,11 @@
 </dependency>
 ```
 
+* spring-boot-starter
+```xml
+<dependency>
+    <groupId>com.github.freegeese</groupId>
+    <artifactId>easy-mybatis-spring-boot-starter</artifactId>
+    <version>1.0</version>
+</dependency>
+```
