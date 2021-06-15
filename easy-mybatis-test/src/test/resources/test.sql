@@ -24,3 +24,17 @@ create table user
 )
     comment 'user';
 
+
+create schema test2 collate utf8mb4_unicode_ci;
+
+create table account
+(
+    id                 bigint auto_increment comment '主键'
+        primary key,
+    username           varchar(64) null comment '用户名',
+    password           varchar(13) null comment '密码',
+    created_date       datetime    null comment '创建日期',
+    last_modified_date datetime    null comment '最后修改日期'
+)
+    comment 'account';
+

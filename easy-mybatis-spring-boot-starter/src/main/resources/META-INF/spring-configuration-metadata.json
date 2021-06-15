@@ -1,0 +1,18 @@
+{
+  "properties": [
+    {
+      "sourceType": "com.github.freegeese.easymybatis.spring.boot.autoconfigure.EasyMybatisProperties",
+      "defaultValue": "lower_camel",
+      "name": "easy-mybatis.java-case-format",
+      "description": "java命名格式",
+      "type": "com.google.common.base.CaseFormat"
+    },
+    {
+      "sourceType": "com.github.freegeese.easymybatis.spring.boot.autoconfigure.EasyMybatisProperties",
+      "defaultValue": "lower_underscore",
+      "name": "easy-mybatis.database-case-format",
+      "description": "数据库命名格式",
+      "type": "com.google.common.base.CaseFormat"
+    }
+  ]
+}

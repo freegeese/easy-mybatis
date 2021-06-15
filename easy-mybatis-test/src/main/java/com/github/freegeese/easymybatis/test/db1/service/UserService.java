@@ -7,5 +7,4 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserService extends BaseService<User, UserMapper> {
-    // com.github.freegeese.easymybatis.test.db1.mapper
 }

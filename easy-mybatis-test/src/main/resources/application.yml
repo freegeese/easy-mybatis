@@ -29,5 +29,5 @@ datasource:
     password:
 
 easy-mybatis:
-  java-case-format: LOWER_CAMEL
-  database-case-format: LOWER_UNDERSCORE
+  java-case-format: lower_camel
+  database-case-format: lower_underscore
