@@ -1,7 +1,6 @@
 package com.github.freegeese.easymybatis.test.configuration;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.github.freegeese.easymybatis.EasyMybatisConfiguration;
 import com.github.freegeese.easymybatis.interceptor.DateableInterceptor;
 import com.github.pagehelper.PageInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -19,7 +18,7 @@ import javax.sql.DataSource;
 @Configuration
 @MapperScan(basePackages = {DataSourceTestConfiguration.MAPPER_PACKAGE}, sqlSessionFactoryRef = "testSqlSessionFactory")
 public class DataSourceTestConfiguration {
-    static final String MAPPER_PACKAGE = "com.github.freegeese.easymybatis.test.mapper";
+    static final String MAPPER_PACKAGE = "com.github.freegeese.easymybatis.test.db1.mapper";
     private final String CONFIGURATION_PREFIX = "datasource.test";
     private final String MAPPER_LOCATION_PATTERN = "classpath:" + MAPPER_PACKAGE.replace(".", "/") + "/**/*.xml";
 
@@ -27,7 +26,7 @@ public class DataSourceTestConfiguration {
     @Bean
     @ConfigurationProperties(prefix = CONFIGURATION_PREFIX)
     public DataSource testDataSource() {
-        return createDataSource();
+        return new DruidDataSource();
     }
 
     @Primary
@@ -40,15 +39,6 @@ public class DataSourceTestConfiguration {
     @Bean
     public SqlSessionFactory testSqlSessionFactory() {
         return createSqlSessionFactory(testDataSource(), MAPPER_LOCATION_PATTERN);
-    }
-
-    /**
-     * 创建数据源
-     *
-     * @return
-     */
-    public DataSource createDataSource() {
-        return new DruidDataSource();
     }
 
     /**
@@ -85,12 +75,7 @@ public class DataSourceTestConfiguration {
             configuration.setMapUnderscoreToCamelCase(true);
 
             sf.setConfiguration(configuration);
-            SqlSessionFactory factory = sf.getObject();
-
-            // 初始化
-            new EasyMybatisConfiguration().init(factory);
-
-            return factory;
+            return sf.getObject();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

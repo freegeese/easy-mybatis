@@ -1,8 +1,8 @@
-package com.github.freegeese.easymybatis.test.mapper;
+package com.github.freegeese.easymybatis.test.db1.mapper;
 
 
 import com.github.freegeese.easymybatis.mapper.BaseMapper;
-import com.github.freegeese.easymybatis.test.domain.User;
+import com.github.freegeese.easymybatis.test.db1.domain.User;
 import org.springframework.stereotype.Repository;
 
 @Repository

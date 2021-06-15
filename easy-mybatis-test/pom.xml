@@ -28,7 +28,7 @@
     <dependencies>
         <dependency>
             <groupId>com.github.freegeese</groupId>
-            <artifactId>easy-mybatis</artifactId>
+            <artifactId>easy-mybatis-spring-boot-starter</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>

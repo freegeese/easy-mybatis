@@ -11,14 +11,13 @@
 ## 使用
 [source,java,indent=0]
 ----
-	// 创建 SqlSessionFactory
-    SqlSessionFactory sqlSessionFactory = null;
-    // 初始化配置
+    // 配置对象
     EasyMybatisConfiguration configuration = new EasyMybatisConfiguration();
     // java命名格式
     configuration.setJavaCaseFormat(CaseFormat.LOWER_CAMEL);
     // 数据库命名格式
     configuration.setDatabaseCaseFormat(CaseFormat.LOWER_UNDERSCORE);
+    // 传入 SqlSessionFactory 进行初始化
     configuration.init(sqlSessionFactory);
 ----
 

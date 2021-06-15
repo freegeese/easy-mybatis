@@ -1,9 +1,9 @@
 package com.github.freegeese.easymybatis.test;
 
 import com.alibaba.fastjson.JSON;
-import com.github.freegeese.easymybatis.test.domain.User;
-import com.github.freegeese.easymybatis.test.mapper.UserMapper;
-import com.github.freegeese.easymybatis.test.service.UserService;
+import com.github.freegeese.easymybatis.test.db1.domain.User;
+import com.github.freegeese.easymybatis.test.db1.mapper.UserMapper;
+import com.github.freegeese.easymybatis.test.db1.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
