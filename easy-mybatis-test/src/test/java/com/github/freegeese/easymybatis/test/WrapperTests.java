@@ -2,7 +2,6 @@ package com.github.freegeese.easymybatis.test;
 
 import com.alibaba.fastjson.JSON;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 import java.lang.invoke.SerializedLambda;
@@ -27,19 +26,18 @@ public class WrapperTests {
         }
     }
 
-    static class EntitySqlWrapper<T> {
+    static class SqlWrapper {
         @SneakyThrows
-        public static <T, R> EntitySqlWrapper<T> select(SerializableFunction<T, R>... functions) {
-            return new EntitySqlWrapper<T>();
+        public static <T, R> SqlWrapper select(SerializableFunction<T, R>... properties) {
+            return new SqlWrapper();
+        }
+
+        static class WhereBuilder {
+            public <T, R> WhereBuilder eq(SerializableFunction<T, R> property, Object value) {
+                return null;
+            }
         }
     }
-
-    @Test
-    void test() {
-
-
-    }
-
 
     interface SerializableFunction<T, R> extends Function<T, R>, Serializable {
     }

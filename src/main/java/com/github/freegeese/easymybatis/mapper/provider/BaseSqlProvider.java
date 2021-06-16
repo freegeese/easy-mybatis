@@ -10,7 +10,7 @@ import org.apache.ibatis.builder.annotation.ProviderContext;
  */
 public class BaseSqlProvider {
     /**
-     * 实体元信息
+     * Entity 元信息
      *
      * @param context
      * @return
@@ -20,7 +20,7 @@ public class BaseSqlProvider {
     }
 
     /**
-     * Mapper元信息
+     * Mapper 元信息
      *
      * @param context
      * @return
