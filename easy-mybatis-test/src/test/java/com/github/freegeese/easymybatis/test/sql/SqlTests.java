@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.github.freegeese.easymybatis.meta.MetaCache;
 import com.github.freegeese.easymybatis.meta.MetaEntityClass;
 import com.github.freegeese.easymybatis.test.db1.domain.User;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class SqlTests {
 
@@ -37,7 +40,11 @@ public class SqlTests {
 
     @Test
     void test2() {
-        SqlWrapper.select(User::getName).where(User::getName, SqlWrapper.Option.eq, "zhangsan").build();
+        SqlWrapper
+                .select(User::getName)
+                .where(User::getName, SqlWrapper.Option.eq, "zhangsan")
+                .where(User::getCreatedDate, SqlWrapper.Option.ge, "2020-12-31")
+                .build();
     }
 
     static class SqlWrapper {
@@ -121,17 +128,63 @@ public class SqlTests {
                 String table = metaEntityClass.getTable();
                 String columns = lambdas.stream().map(v -> getMethodAndResultMappingMap.get(v.getImplMethodName()).getColumn()).collect(Collectors.joining(","));
                 StringBuilder sql = new StringBuilder("select " + columns + " from " + table);
+                Map<String, Object> parameterMap = Maps.newHashMap();
 
-                for (Condition condition : conditions) {
+                List<String> conditionItems = new ArrayList<>();
+                for (int i = 0; i < conditions.size(); i++) {
+                    Condition condition = conditions.get(i);
+
                     List<Expression> expressions = condition.getExpressions();
-                    for (Expression expression : expressions) {
+                    List<String> expressionItems = new ArrayList<>(expressions.size());
+                    for (int j = 0; j < expressions.size(); j++) {
+                        Expression expression = expressions.get(j);
+                        Option option = expression.getOption();
+                        Object value = expression.getValue();
+
                         MetaEntityClass.ResultMapping resultMapping = getMethodAndResultMappingMap.get(MetaLambdaCache.get(expression.getProperty()).getImplMethodName());
-                        String exp = String.join(" ", resultMapping.getColumn(), expression.getOption().getValue(), "#{" + resultMapping.getProperty() + "}");
-                        sql.append(" ").append(exp);
+                        String column = resultMapping.getColumn();
+                        String property = resultMapping.getProperty();
+
+                        // 参数名称
+                        String key = Joiner.on("_").join(i, j, property);
+                        // 参数占位 #{key}
+                        String placeholder = toPlaceholder(key);
+
+                        if (option == Option.between) {
+                            List values = (List) value;
+                            Object low = values.get(0);
+                            Object high = values.get(1);
+                            String lowKey = key + "_low";
+                            String highKey = key + "_high";
+                            parameterMap.put(lowKey, low);
+                            parameterMap.put(highKey, high);
+                            expressionItems.add(Joiner.on(" ").join(column, option.format(toPlaceholder(lowKey), toPlaceholder(highKey))));
+                            continue;
+                        }
+
+                        parameterMap.put(key, value);
+                        if (option == Option.in || option == Option.notIn) {
+                            expressionItems.add(Joiner.on(" ").join(column, IntStream.range(0, ((Collection<?>) value).size()).mapToObj(v -> toPlaceholder(key + ".[" + v + "]")).collect(Collectors.joining(","))));
+                            continue;
+                        }
+
+                        parameterMap.put(key, value);
+                        expressionItems.add(Joiner.on(" ").join(column, option.format(placeholder)));
                     }
+
+                    String join = condition.getJoin().name();
+                    conditionItems.add((conditionItems.isEmpty() ? "where" : join) + " (" + Joiner.on(" " + join + " ").join(expressionItems) + ")");
                 }
 
+                if (!conditionItems.isEmpty()) {
+                    sql.append(" " + Joiner.on(" ").join(conditionItems));
+                }
                 System.out.println(sql);
+                System.out.println(JSON.toJSONString(parameterMap, true));
+            }
+
+            private String toPlaceholder(String key) {
+                return "#{" + key + "}";
             }
         }
 
@@ -189,9 +242,27 @@ public class SqlTests {
         }
 
         enum Option {
-            eq("="),
-            ne("!="),
-            isNull("is null");
+            eq("= %s"),
+            ne("!= %s"),
+
+            gt("> %s"),
+            ge(">= %s"),
+
+            lt("< %s"),
+            le("<= %s"),
+
+            in("in (%s)"),
+            notIn("not in (%s)"),
+
+            like("like %s"),
+            startLike("like concat(%s,'%')"),
+            endLike("like concat('%',%s)"),
+            fullLike("like concat('%',%s,'%')"),
+
+            between("between %s and %s"),
+
+            isNull("is null"),
+            isNotNull("is not null");
 
 
             private final String value;
@@ -202,6 +273,10 @@ public class SqlTests {
 
             public String getValue() {
                 return value;
+            }
+
+            public String format(Object... args) {
+                return String.format(getValue(), args);
             }
         }
     }
