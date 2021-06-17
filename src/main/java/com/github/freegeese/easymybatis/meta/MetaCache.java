@@ -1,5 +1,6 @@
 package com.github.freegeese.easymybatis.meta;
 
+import com.github.freegeese.easymybatis.util.RefUtils;
 import org.apache.ibatis.mapping.MappedStatement;
 
 import java.util.Map;
@@ -27,12 +28,30 @@ public class MetaCache {
         return metaEntityClass;
     }
 
+    public static MetaEntityClass getMetaEntityClass(String entityClassName) {
+        if (metaEntityClassCache.containsKey(entityClassName)) {
+            return metaEntityClassCache.get(entityClassName);
+        }
+        MetaEntityClass metaEntityClass = MetaEntityClass.forClass(RefUtils.classForName(entityClassName));
+        metaEntityClassCache.put(entityClassName, metaEntityClass);
+        return metaEntityClass;
+    }
+
     public static MetaMapperClass getMetaMapperClass(Class<?> mapperClass) {
         String mapperClassName = mapperClass.getName();
         if (metaMapperClassCache.containsKey(mapperClassName)) {
             return metaMapperClassCache.get(mapperClassName);
         }
         MetaMapperClass metaMapperClass = MetaMapperClass.forMapperClass(mapperClass);
+        metaMapperClassCache.put(mapperClassName, metaMapperClass);
+        return metaMapperClass;
+    }
+
+    public static MetaMapperClass getMetaMapperClass(String mapperClassName) {
+        if (metaMapperClassCache.containsKey(mapperClassName)) {
+            return metaMapperClassCache.get(mapperClassName);
+        }
+        MetaMapperClass metaMapperClass = MetaMapperClass.forMapperClass(RefUtils.classForName(mapperClassName));
         metaMapperClassCache.put(mapperClassName, metaMapperClass);
         return metaMapperClass;
     }

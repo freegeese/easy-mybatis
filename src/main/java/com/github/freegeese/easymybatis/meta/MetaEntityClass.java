@@ -314,7 +314,7 @@ public class MetaEntityClass {
         return primaryKeyResultMapping;
     }
 
-    public Map<String, ResultMapping> getGetMethodAndThisMap() {
+    public Map<String, ResultMapping> getGetMethodAndResultMappingMap() {
         return resultMappings.stream().collect(Collectors.toMap(v -> v.getGetMethod().getName(), Function.identity()));
     }
 

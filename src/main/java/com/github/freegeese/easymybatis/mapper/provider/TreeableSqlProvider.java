@@ -33,7 +33,7 @@ public class TreeableSqlProvider extends BaseSqlProvider {
 
         if (sourceNode.getId() != targetNode.getId() && sourceNode.getParentId() == targetNode.getParentId()) {
             MetaEntityClass meta = getMetaEntityClass(context);
-            Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
+            Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndResultMappingMap();
             MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
             MetaEntityClass.ResultMapping idProp = getMethodAndThisMap.get(treeableGetMethod.getGetId());
@@ -60,7 +60,7 @@ public class TreeableSqlProvider extends BaseSqlProvider {
         Treeable toNode = (Treeable) to;
         if (fromNode.getId() != toNode.getId() && fromNode.getParentId() == toNode.getParentId()) {
             MetaEntityClass meta = getMetaEntityClass(context);
-            Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
+            Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndResultMappingMap();
             MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
             MetaEntityClass.ResultMapping idProp = getMethodAndThisMap.get(treeableGetMethod.getGetId());
@@ -100,7 +100,7 @@ public class TreeableSqlProvider extends BaseSqlProvider {
      */
     public String selectPreviousSibling(Object target, ProviderContext context) {
         MetaEntityClass meta = getMetaEntityClass(context);
-        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
+        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndResultMappingMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
         String table = meta.getTable();
@@ -120,7 +120,7 @@ public class TreeableSqlProvider extends BaseSqlProvider {
      */
     public String selectNextSibling(Object target, ProviderContext context) {
         MetaEntityClass meta = getMetaEntityClass(context);
-        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
+        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndResultMappingMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
         String table = meta.getTable();
@@ -140,7 +140,7 @@ public class TreeableSqlProvider extends BaseSqlProvider {
      */
     public String selectFirstSibling(Object target, ProviderContext context) {
         MetaEntityClass meta = getMetaEntityClass(context);
-        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
+        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndResultMappingMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
         String table = meta.getTable();
@@ -160,7 +160,7 @@ public class TreeableSqlProvider extends BaseSqlProvider {
      */
     public String selectLastSibling(Object target, ProviderContext context) {
         MetaEntityClass meta = getMetaEntityClass(context);
-        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
+        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndResultMappingMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
         String table = meta.getTable();
@@ -179,7 +179,7 @@ public class TreeableSqlProvider extends BaseSqlProvider {
      */
     public String selectParents(ProviderContext context) {
         MetaEntityClass meta = getMetaEntityClass(context);
-        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
+        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndResultMappingMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
         String table = meta.getTable();
@@ -200,7 +200,7 @@ public class TreeableSqlProvider extends BaseSqlProvider {
      */
     public String selectChildren(@Param("target") Objects target, @Param("deep") boolean deep, ProviderContext context) {
         MetaEntityClass meta = getMetaEntityClass(context);
-        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
+        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndResultMappingMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
         String table = meta.getTable();
@@ -225,7 +225,7 @@ public class TreeableSqlProvider extends BaseSqlProvider {
      */
     public String updateChildrenPath(@Param("target") Object target, @Param("oldPath") String oldPath, ProviderContext context) {
         MetaEntityClass meta = getMetaEntityClass(context);
-        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
+        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndResultMappingMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
         String table = meta.getTable();
@@ -245,7 +245,7 @@ public class TreeableSqlProvider extends BaseSqlProvider {
      */
     public String selectRoot(ProviderContext context) {
         MetaEntityClass meta = getMetaEntityClass(context);
-        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndThisMap();
+        Map<String, MetaEntityClass.ResultMapping> getMethodAndThisMap = meta.getGetMethodAndResultMappingMap();
         MetaEntityClass.TreeableGetMethod treeableGetMethod = MetaEntityClass.getTreeableGetMethod();
 
         String table = meta.getTable();
