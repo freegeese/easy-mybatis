@@ -220,6 +220,9 @@ public class EasyMybatisConfiguration {
     }
 
     public static EasyMybatisConfiguration getInstance() {
+        if (Objects.isNull(instance)) {
+            return new EasyMybatisConfiguration();
+        }
         return instance;
     }
 }

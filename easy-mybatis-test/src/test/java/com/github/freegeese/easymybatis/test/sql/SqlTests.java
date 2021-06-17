@@ -120,7 +120,17 @@ public class SqlTests {
 
                 String table = metaEntityClass.getTable();
                 String columns = lambdas.stream().map(v -> getMethodAndResultMappingMap.get(v.getImplMethodName()).getColumn()).collect(Collectors.joining(","));
-                String sql = "select " + columns + " from " + table;
+                StringBuilder sql = new StringBuilder("select " + columns + " from " + table);
+
+                for (Condition condition : conditions) {
+                    List<Expression> expressions = condition.getExpressions();
+                    for (Expression expression : expressions) {
+                        MetaEntityClass.ResultMapping resultMapping = getMethodAndResultMappingMap.get(MetaLambdaCache.get(expression.getProperty()).getImplMethodName());
+                        String exp = String.join(" ", resultMapping.getColumn(), expression.getOption().getValue(), "#{" + resultMapping.getProperty() + "}");
+                        sql.append(" ").append(exp);
+                    }
+                }
+
                 System.out.println(sql);
             }
         }
