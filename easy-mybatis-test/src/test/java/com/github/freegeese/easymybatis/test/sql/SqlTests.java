@@ -44,6 +44,9 @@ public class SqlTests {
                 .select(User::getName)
                 .where(User::getName, SqlWrapper.Option.eq, "zhangsan")
                 .where(User::getCreatedDate, SqlWrapper.Option.ge, "2020-12-31")
+                .or()
+                .where(User::getPhone, SqlWrapper.Option.between.not(), Arrays.asList("133", "135"))
+                .where(User::getName, SqlWrapper.Option.between.not(), Arrays.asList("a", "b"))
                 .build();
     }
 
@@ -120,6 +123,16 @@ public class SqlTests {
             }
 
             public void build() {
+//                Map<String, Object> updateParameterMap = Maps.newHashMap();
+//                Map<SerializableFunction, Object> updatePropertyValueMap = wrapper.updatePropertyValueMap;
+//                MetaEntityClass meta = MetaCache.getMetaEntityClass(MetaLambdaCache.get(updatePropertyValueMap.keySet().iterator().next()).getImplClass().replace("/", "."));
+//
+//                for (Map.Entry<SerializableFunction, Object> entry : updatePropertyValueMap.entrySet()) {
+//                    MetaLambda lambda = MetaLambdaCache.get(entry.getKey());
+//                    lambda.getImplMethodName();
+//                }
+
+
                 List<MetaLambda> lambdas = wrapper.selectProperties.stream().map(MetaLambdaCache::get).collect(Collectors.toList());
                 String className = lambdas.get(0).getImplClass().replace("/", ".");
                 MetaEntityClass metaEntityClass = MetaCache.getMetaEntityClass(className);
@@ -163,12 +176,17 @@ public class SqlTests {
                         }
 
                         parameterMap.put(key, value);
-                        if (option == Option.in || option == Option.notIn) {
+
+                        if (option == Option.in) {
                             expressionItems.add(Joiner.on(" ").join(column, IntStream.range(0, ((Collection<?>) value).size()).mapToObj(v -> toPlaceholder(key + ".[" + v + "]")).collect(Collectors.joining(","))));
                             continue;
                         }
 
-                        parameterMap.put(key, value);
+                        if (option == Option.isNull || option == Option.isNotNull) {
+                            expressionItems.add(Joiner.on(" ").join(column, option.getValue()));
+                            continue;
+                        }
+
                         expressionItems.add(Joiner.on(" ").join(column, option.format(placeholder)));
                     }
 
@@ -252,7 +270,6 @@ public class SqlTests {
             le("<= %s"),
 
             in("in (%s)"),
-            notIn("not in (%s)"),
 
             like("like %s"),
             startLike("like concat(%s,'%')"),
@@ -265,7 +282,7 @@ public class SqlTests {
             isNotNull("is not null");
 
 
-            private final String value;
+            private String value;
 
             Option(String value) {
                 this.value = value;
@@ -274,6 +291,12 @@ public class SqlTests {
             public String getValue() {
                 return value;
             }
+
+            public Option not() {
+                this.value = "not " + this.value;
+                return this;
+            }
+
 
             public String format(Object... args) {
                 return String.format(getValue(), args);
