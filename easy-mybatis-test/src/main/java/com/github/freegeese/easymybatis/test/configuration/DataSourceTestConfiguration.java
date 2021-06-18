@@ -2,6 +2,7 @@ package com.github.freegeese.easymybatis.test.configuration;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.github.freegeese.easymybatis.interceptor.DateableInterceptor;
+import com.github.freegeese.easymybatis.interceptor.SqlWrapperInterceptor;
 import com.github.pagehelper.PageInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -65,7 +66,7 @@ public class DataSourceTestConfiguration {
             sf.setMapperLocations(new PathMatchingResourcePatternResolver().getResources(mapperLocationPattern));
 
             // 插件
-            sf.setPlugins(new PageInterceptor(), new DateableInterceptor());
+            sf.setPlugins(new PageInterceptor(), new DateableInterceptor(), new SqlWrapperInterceptor());
 
             // 默认属性
             org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();

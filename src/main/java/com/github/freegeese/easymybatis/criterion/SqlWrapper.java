@@ -123,6 +123,8 @@ public class SqlWrapper {
         return this;
     }
 
+    private static final String PARAMETER_NAME_PREFIX = "parameterMap";
+
     /**
      * 解包装，生成SQL和SQL对应的参数
      *
@@ -130,7 +132,6 @@ public class SqlWrapper {
      */
     public Result unwrap() {
         Result result = assembleSqlPrefix();
-        Map<String, Object> parameterMap = result.getParameterMap();
         MetaEntityClass metaEntityClass = result.getMetaEntityClass();
         Map<String, MetaEntityClass.ResultMapping> getMethodAndResultMappingMap = metaEntityClass.getGetMethodAndResultMappingMap();
         StringBuilder sql = new StringBuilder(result.getSql());
@@ -161,13 +162,13 @@ public class SqlWrapper {
                     Object high = values.get(1);
                     String lowKey = key + "_low";
                     String highKey = key + "_high";
-                    parameterMap.put(lowKey, low);
-                    parameterMap.put(highKey, high);
+                    result.addParameter(lowKey, low);
+                    result.addParameter(highKey, high);
                     expressionItems.add(Joiner.on(" ").join(column, option.format(toPlaceholder(lowKey), toPlaceholder(highKey))));
                     continue;
                 }
 
-                parameterMap.put(key, value);
+                result.addParameter(key, value);
 
                 if (option == Option.in) {
                     expressionItems.add(Joiner.on(" ").join(column, IntStream.range(0, ((Collection<?>) value).size()).mapToObj(v -> toPlaceholder(key + ".[" + v + "]")).collect(Collectors.joining(","))));
@@ -190,7 +191,7 @@ public class SqlWrapper {
             sql.append(" ").append(Joiner.on(" ").join(conditionItems));
         }
 
-        return result.setSql(sql.toString()).setParameterMap(parameterMap);
+        return result.setSql(sql.toString());
     }
 
     /**
@@ -199,18 +200,19 @@ public class SqlWrapper {
      * @return
      */
     private Result assembleSqlPrefix() {
+        Result result = new Result();
+
         // select
         if (Objects.nonNull(selectProperties)) {
             List<MetaLambda> lambdas = selectProperties.stream().map(MetaLambdaCache::get).collect(Collectors.toList());
             MetaEntityClass metaEntityClass = Objects.nonNull(selectFrom) ? MetaCache.getMetaEntityClass(selectFrom) : MetaCache.getMetaEntityClass(lambdas.get(0).getImplClass().replace("/", "."));
             Map<String, MetaEntityClass.ResultMapping> getMethodAndResultMappingMap = metaEntityClass.getGetMethodAndResultMappingMap();
             String columns = lambdas.stream().map(v -> getMethodAndResultMappingMap.get(v.getImplMethodName()).getColumn()).collect(Collectors.joining(", "));
-            return new Result().setSql("select " + columns + " from " + metaEntityClass.getTable()).setMetaEntityClass(metaEntityClass).setParameterMap(Maps.newHashMap());
+            return result.setSql("select " + columns + " from " + metaEntityClass.getTable()).setMetaEntityClass(metaEntityClass);
         }
 
         // update
         if (Objects.nonNull(updatePropertyValueMap)) {
-            Map<String, Object> parameterMap = Maps.newHashMap();
             MetaEntityClass meta = Objects.nonNull(updateFrom) ? MetaCache.getMetaEntityClass(updateFrom) : MetaCache.getMetaEntityClass(MetaLambdaCache.get(updatePropertyValueMap.keySet().iterator().next()).getImplClass().replace("/", "."));
             Map<String, MetaEntityClass.ResultMapping> getMethodAndResultMappingMap = meta.getGetMethodAndResultMappingMap();
 
@@ -219,18 +221,18 @@ public class SqlWrapper {
                 MetaLambda lambda = MetaLambdaCache.get(entry.getKey());
                 MetaEntityClass.ResultMapping resultMapping = getMethodAndResultMappingMap.get(lambda.getImplMethodName());
                 sets.add(resultMapping.getColumn() + "=" + toPlaceholder(resultMapping.getProperty()));
-                parameterMap.put(resultMapping.getProperty(), entry.getValue());
-                return new Result().setSql("update " + meta.getTable() + " set " + Joiner.on(", ").join(sets)).setMetaEntityClass(meta).setParameterMap(parameterMap);
+                result.addParameter(resultMapping.getProperty(), entry.getValue());
+                return result.setSql("update " + meta.getTable() + " set " + Joiner.on(", ").join(sets)).setMetaEntityClass(meta);
             }
         }
 
         // delete
         MetaEntityClass meta = MetaCache.getMetaEntityClass(deleteFrom);
-        return new Result().setSql("delete from " + meta.getTable()).setMetaEntityClass(meta).setParameterMap(Maps.newHashMap());
+        return result.setSql("delete from " + meta.getTable()).setMetaEntityClass(meta);
     }
 
     private String toPlaceholder(String key) {
-        return "#{" + key + "}";
+        return "#{" + PARAMETER_NAME_PREFIX + "." + key + "}";
     }
 
     @Getter
@@ -240,6 +242,7 @@ public class SqlWrapper {
         private MetaEntityClass metaEntityClass;
 
         public Result() {
+            this.parameterMap = Maps.newHashMap();
         }
 
         private Result setSql(String sql) {
@@ -247,14 +250,16 @@ public class SqlWrapper {
             return this;
         }
 
-        private Result setParameterMap(Map<String, Object> parameterMap) {
-            this.parameterMap = parameterMap;
-            return this;
-        }
-
         private Result setMetaEntityClass(MetaEntityClass metaEntityClass) {
             this.metaEntityClass = metaEntityClass;
             return this;
         }
+
+        private Result addParameter(String key, Object value) {
+            parameterMap.put(key, value);
+            return this;
+        }
+
+
     }
 }
