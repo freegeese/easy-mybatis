@@ -5,6 +5,10 @@ import lombok.Getter;
 /**
  * SQL的一个条件语句
  * <p> 跟在 where 后面的一个and或者or条件
+ *
+ * @author zhangguangyong
+ * @see ConditionGroup
+ * @since 1.0
  */
 @Getter
 public class Condition {

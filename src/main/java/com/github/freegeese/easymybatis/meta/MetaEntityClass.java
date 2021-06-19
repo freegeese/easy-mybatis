@@ -147,7 +147,7 @@ public class MetaEntityClass {
             return String.join(" ", column, condition.symbol, "#{" + property + "}");
         }
 
-        enum Condition {
+        private enum Condition {
             ne("!="),
             eq("="),
             gt(">"),

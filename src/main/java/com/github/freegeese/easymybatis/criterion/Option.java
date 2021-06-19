@@ -2,6 +2,13 @@ package com.github.freegeese.easymybatis.criterion;
 
 import com.google.common.base.Strings;
 
+/**
+ * SQL 条件运算符
+ *
+ * @author zhangguangyong
+ * @see Expression
+ * @since 1.0
+ */
 public enum Option {
     eq("= %s"),
     ne("!= %s"),

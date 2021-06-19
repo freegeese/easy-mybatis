@@ -13,9 +13,13 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * SQL 包装器
+ * SQL包装器，面向实体的SQL操作
+ * <P> 提供面向实体属性的 select,update,delete 操作
+ * 提示：复杂的SQL请不要使用此类进行编写，最好写在XML中，以便于后期维护
+ *
+ * @author zhangguangyong
+ * @since 1.0
  */
-
 public class SqlWrapper {
     private Class<?> selectFrom;
     private List<SerializableFunction> selectProperties;
