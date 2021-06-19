@@ -9,7 +9,7 @@ import java.util.List;
  * @see Pagination
  * @since 1.0
  */
-public interface Pageable<T> {
+public interface Pageable {
     /**
      * 第几页
      *
@@ -52,7 +52,7 @@ public interface Pageable<T> {
      *
      * @return
      */
-    List<T> getContent();
+    <T> List<T> getContent();
 
-    void setContent(List<T> content);
+    <T> void setContent(List<T> content);
 }

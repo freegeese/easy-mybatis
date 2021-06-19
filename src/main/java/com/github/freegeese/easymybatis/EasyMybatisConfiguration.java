@@ -147,15 +147,15 @@ public class EasyMybatisConfiguration {
             String mapperClassName = id.substring(0, index);
             String mapperMethodName = id.substring(index + 1);
 
-            // 先从缓存获取
-            if (mapperResultMapsCache.containsKey(mapperClassName)) {
-                MetaObjectWrapper.forObject(mappedStatement).setValue("resultMaps", mapperResultMapsCache.get(mapperClassName));
-                continue;
-            }
-
             // 查看 MappedStatement-method 是否声明了注解：@AutoResultMap，没有则不进行处理
             Method method = mapperMethodMap.get(mapperClassName).get(mapperMethodName);
             if (Objects.isNull(method.getAnnotation(autoResultMapClass))) {
+                continue;
+            }
+
+            // 先从缓存获取
+            if (mapperResultMapsCache.containsKey(mapperClassName)) {
+                MetaObjectWrapper.forObject(mappedStatement).setValue("resultMaps", mapperResultMapsCache.get(mapperClassName));
                 continue;
             }
 

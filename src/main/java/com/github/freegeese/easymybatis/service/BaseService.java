@@ -120,20 +120,24 @@ public class BaseService<T, M extends BaseMapper<T>> {
         return mapper.selectAll();
     }
 
+    public Long selectCount() {
+        return mapper.selectCount();
+    }
+
     // 分页 =================================================================================
-    public Pageable<T> selectPage(Pageable<T> page) {
+    public Pageable selectPage(Pageable page) {
         return copyPageInfo(page, PageHelper.offsetPage(page.getOffset(), page.getPageSize()).doSelectPageInfo(() -> mapper.selectAll()));
     }
 
-    public Pageable<T> selectPageByEntity(Pageable<T> page, T entity) {
+    public Pageable selectPageByEntity(Pageable page, T entity) {
         return copyPageInfo(page, PageHelper.offsetPage(page.getOffset(), page.getPageSize()).doSelectPageInfo(() -> mapper.selectByEntity(entity)));
     }
 
-    public Pageable<T> selectPageByParameterMap(Pageable<T> page, Map<String, Object> parameterMap) {
+    public Pageable selectPageByParameterMap(Pageable page, Map<String, Object> parameterMap) {
         return copyPageInfo(page, PageHelper.offsetPage(page.getOffset(), page.getPageSize()).doSelectPageInfo(() -> mapper.selectByParameterMap(parameterMap)));
     }
 
-    private Pageable<T> copyPageInfo(Pageable<T> page, PageInfo<T> pageInfo) {
+    private Pageable copyPageInfo(Pageable page, PageInfo<T> pageInfo) {
         page.setTotalRecords(pageInfo.getTotal());
         page.setContent(pageInfo.getList());
         return page;

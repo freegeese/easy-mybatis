@@ -60,8 +60,8 @@ public class UpdateSqlProvider extends BaseSqlProvider{
             MetaEntityClass.ResultMapping primaryKey = meta.checkPrimaryKey(entity);
             int i = index.getAndIncrement();
 
-            String sets = resultMappings.stream().map(v -> v.getColumn() + " = #{entities[" + i + "]" + v.getProperty() + "}").collect(Collectors.joining(","));
-            SQL sql = new SQL().UPDATE(meta.getTable()).SET(sets).WHERE(primaryKey.getColumn() + " = #{entities[" + i + "]" + primaryKey.getProperty() + "}");
+            String sets = resultMappings.stream().map(v -> v.getColumn() + " = #{entities[" + i + "]." + v.getProperty() + "}").collect(Collectors.joining(","));
+            SQL sql = new SQL().UPDATE(meta.getTable()).SET(sets).WHERE(primaryKey.getColumn() + " = #{entities[" + i + "]." + primaryKey.getProperty() + "}");
 
             sqls.add(sql);
         }

@@ -18,7 +18,7 @@ import java.util.Objects;
  * @since 1.0
  */
 @Data
-public class Pagination<T> implements Pageable<T> {
+public class Pagination implements Pageable {
     // 页码
     private Integer pageNumber;
 
@@ -32,7 +32,7 @@ public class Pagination<T> implements Pageable<T> {
     private Long totalRecords;
 
     // 页面数据
-    private List<T> content = new ArrayList<>();
+    private List content = new ArrayList<>();
 
     public Pagination() {
     }

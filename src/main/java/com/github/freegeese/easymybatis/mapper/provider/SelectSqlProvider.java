@@ -73,7 +73,7 @@ public class SelectSqlProvider extends BaseSqlProvider {
      * @param parameterMap
      * @return
      */
-    public String selectByParameterMap(@Param("parameterMap") Map<String, Object> parameterMap, ProviderContext context) {
+    public String selectByParameterMap(Map<String, Object> parameterMap, ProviderContext context) {
         MetaEntityClass meta = getMetaEntityClass(context);
         SQL sql = new SQL().SELECT(meta.getColumns()).FROM(meta.getTable());
         List<MetaEntityClass.ResultMapping> resultMappings = meta.getResultMappings();
@@ -82,7 +82,7 @@ public class SelectSqlProvider extends BaseSqlProvider {
             if (Objects.isNull(parameterMap.getOrDefault(resultMapping.getProperty(), null))) {
                 continue;
             }
-            sql.WHERE(resultMapping.getColumn() + " ${parameterMap." + resultMapping.getProperty() + "}");
+            sql.WHERE(resultMapping.getColumn() + " ${" + resultMapping.getProperty() + "}");
         }
         return sql.toString();
     }
@@ -96,5 +96,16 @@ public class SelectSqlProvider extends BaseSqlProvider {
         MetaEntityClass meta = getMetaEntityClass(context);
         SQL sql = new SQL().SELECT(meta.getColumns()).FROM(meta.getTable());
         return sql.toString();
+    }
+
+    /**
+     * 查询总数
+     *
+     * @param context
+     * @return
+     */
+    public String selectCount(ProviderContext context) {
+        MetaEntityClass meta = getMetaEntityClass(context);
+        return new SQL().SELECT("count(*)").FROM(meta.getTable()).toString();
     }
 }

@@ -35,4 +35,7 @@ public interface SelectMapper<T> {
     @SelectProvider(type = SelectSqlProvider.class, method = "selectAll")
     @AutoResultMap
     List<T> selectAll();
+
+    @SelectProvider(type = SelectSqlProvider.class, method = "selectCount")
+    Long selectCount();
 }

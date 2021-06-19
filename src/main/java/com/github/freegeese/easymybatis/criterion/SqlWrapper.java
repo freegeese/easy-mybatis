@@ -86,16 +86,25 @@ public class SqlWrapper {
     }
 
 
-    public static SqlWrapper update(Map<SerializableFunction, Object> propertyValueMap) {
-        return new SqlWrapper().setUpdatePropertyValueMap(propertyValueMap);
+    public static SqlWrapper update() {
+        return new SqlWrapper().setUpdatePropertyValueMap(Maps.newHashMap());
     }
 
-    public static SqlWrapper update(Class<?> from, Map<SerializableFunction, Object> propertyValueMap) {
-        return update(propertyValueMap).setUpdateFrom(from);
+    public static SqlWrapper update(Class<?> from) {
+        return update().setUpdateFrom(from);
     }
 
     public static SqlWrapper delete(Class<?> from) {
         return new SqlWrapper().setDeleteFrom(from);
+    }
+
+    public <T, R> SqlWrapper setNull(SerializableFunction<T, R> property) {
+        return set(property, null);
+    }
+
+    public <T, R> SqlWrapper set(SerializableFunction<T, R> property, Object value) {
+        updatePropertyValueMap.put(property, value);
+        return this;
     }
 
     public <T, R> SqlWrapper where(SerializableFunction<T, R> property, Option option, Object value) {
@@ -222,8 +231,8 @@ public class SqlWrapper {
                 MetaEntityClass.ResultMapping resultMapping = getMethodAndResultMappingMap.get(lambda.getImplMethodName());
                 sets.add(resultMapping.getColumn() + "=" + toPlaceholder(resultMapping.getProperty()));
                 result.addParameter(resultMapping.getProperty(), entry.getValue());
-                return result.setSql("update " + meta.getTable() + " set " + Joiner.on(", ").join(sets)).setMetaEntityClass(meta);
             }
+            return result.setSql("update " + meta.getTable() + " set " + Joiner.on(", ").join(sets)).setMetaEntityClass(meta);
         }
 
         // delete
@@ -241,7 +250,7 @@ public class SqlWrapper {
         private Map<String, Object> parameterMap;
         private MetaEntityClass metaEntityClass;
 
-        public Result() {
+        private Result() {
             this.parameterMap = Maps.newHashMap();
         }
 
@@ -259,7 +268,5 @@ public class SqlWrapper {
             parameterMap.put(key, value);
             return this;
         }
-
-
     }
 }
