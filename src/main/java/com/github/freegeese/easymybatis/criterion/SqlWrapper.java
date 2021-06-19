@@ -21,15 +21,39 @@ import java.util.stream.IntStream;
  * @since 1.0
  */
 public class SqlWrapper {
+    /**
+     * 查询表
+     */
     private Class<?> selectFrom;
+
+    /**
+     * 查询列
+     */
     private List<SerializableFunction> selectProperties;
 
+    /**
+     * 更新表
+     */
     private Class<?> updateFrom;
+
+    /**
+     * 更新列
+     */
     private Map<SerializableFunction, Object> updatePropertyValueMap;
 
+    /**
+     * 删除表
+     */
     private Class<?> deleteFrom;
 
+    /**
+     * 条件组集合
+     */
     private List<ConditionGroup> conditionGroups;
+
+    /**
+     * 下一个条件组
+     */
     private ConditionGroup nextConditionGroup;
 
     public SqlWrapper() {
@@ -89,50 +113,194 @@ public class SqlWrapper {
         return select(properties).setSelectFrom(from);
     }
 
-
+    /**
+     * 更新操作
+     *
+     * @return
+     */
     public static SqlWrapper update() {
         return new SqlWrapper().setUpdatePropertyValueMap(Maps.newHashMap());
     }
 
+    /**
+     * 更新操作
+     *
+     * @param from 类
+     * @return
+     */
     public static SqlWrapper update(Class<?> from) {
         return update().setUpdateFrom(from);
     }
 
+    /**
+     * 删除操作
+     *
+     * @param from 类
+     * @return
+     */
     public static SqlWrapper delete(Class<?> from) {
         return new SqlWrapper().setDeleteFrom(from);
     }
 
+    /**
+     * 更新操作，设置列为null
+     *
+     * @param property
+     * @param <T>
+     * @param <R>
+     * @return
+     */
     public <T, R> SqlWrapper setNull(SerializableFunction<T, R> property) {
         return set(property, null);
     }
 
+    /**
+     * 更新操作，设置列值
+     *
+     * @param property
+     * @param value
+     * @param <T>
+     * @param <R>
+     * @return
+     */
     public <T, R> SqlWrapper set(SerializableFunction<T, R> property, Object value) {
         updatePropertyValueMap.put(property, value);
         return this;
     }
 
+    /**
+     * 过滤条件
+     *
+     * @param property
+     * @param option
+     * @param value
+     * @param <T>
+     * @param <R>
+     * @return
+     */
     public <T, R> SqlWrapper where(SerializableFunction<T, R> property, Option option, Object value) {
         return and(new Expression(property, option, value));
     }
 
+    /**
+     * 过滤条件
+     *
+     * @param property
+     * @param option
+     * @param <T>
+     * @param <R>
+     * @return
+     */
     public <T, R> SqlWrapper where(SerializableFunction<T, R> property, Option option) {
         return and(new Expression(property, option));
     }
 
+    /**
+     * and 过滤条件
+     *
+     * @param property
+     * @param option
+     * @param value
+     * @param <T>
+     * @param <R>
+     * @return
+     */
     public <T, R> SqlWrapper and(SerializableFunction<T, R> property, Option option, Object value) {
         return and(new Expression(property, option, value));
     }
 
+    /**
+     * and 过滤条件
+     *
+     * @param property
+     * @param option
+     * @param <T>
+     * @param <R>
+     * @return
+     */
     public <T, R> SqlWrapper and(SerializableFunction<T, R> property, Option option) {
         return and(new Expression(property, option));
     }
 
+    /**
+     * or 过滤条件
+     *
+     * @param property
+     * @param option
+     * @param value
+     * @param <T>
+     * @param <R>
+     * @return
+     */
     public <T, R> SqlWrapper or(SerializableFunction<T, R> property, Option option, Object value) {
         return or(new Expression(property, option, value));
     }
 
+    /**
+     * or 过滤条件
+     *
+     * @param property
+     * @param option
+     * @param <T>
+     * @param <R>
+     * @return
+     */
     public <T, R> SqlWrapper or(SerializableFunction<T, R> property, Option option) {
         return or(new Expression(property, option));
+    }
+
+    /**
+     * 一组 or 过滤条件
+     *
+     * @param property
+     * @param option
+     * @param value
+     * @param <T>
+     * @param <R>
+     * @return
+     */
+    public <T, R> SqlWrapper orGroup(SerializableFunction<T, R> property, Option option, Object value) {
+        return orGroup().or(new Expression(property, option, value));
+    }
+
+    /**
+     * 一组 or 过滤条件
+     *
+     * @param property
+     * @param option
+     * @param <T>
+     * @param <R>
+     * @return
+     */
+    public <T, R> SqlWrapper orGroup(SerializableFunction<T, R> property, Option option) {
+        return orGroup().or(new Expression(property, option));
+    }
+
+    /**
+     * 一组 and 过滤条件
+     *
+     * @param property
+     * @param option
+     * @param value
+     * @param <T>
+     * @param <R>
+     * @return
+     */
+    public <T, R> SqlWrapper andGroup(SerializableFunction<T, R> property, Option option, Object value) {
+        return andGroup().and(new Expression(property, option, value));
+    }
+
+    /**
+     * 一组 and 过滤条件
+     *
+     * @param property
+     * @param option
+     * @param <T>
+     * @param <R>
+     * @return
+     */
+    public <T, R> SqlWrapper andGroup(SerializableFunction<T, R> property, Option option) {
+        return andGroup().and(new Expression(property, option));
     }
 
     private SqlWrapper and(Expression expression) {
@@ -145,21 +313,6 @@ public class SqlWrapper {
         return this;
     }
 
-    public <T, R> SqlWrapper orGroup(SerializableFunction<T, R> property, Option option, Object value) {
-        return orGroup().or(new Expression(property, option, value));
-    }
-
-    public <T, R> SqlWrapper orGroup(SerializableFunction<T, R> property, Option option) {
-        return orGroup().or(new Expression(property, option));
-    }
-
-    public <T, R> SqlWrapper andGroup(SerializableFunction<T, R> property, Option option, Object value) {
-        return andGroup().and(new Expression(property, option, value));
-    }
-
-    public <T, R> SqlWrapper andGroup(SerializableFunction<T, R> property, Option option) {
-        return andGroup().and(new Expression(property, option));
-    }
 
     private SqlWrapper orGroup() {
         return addGroup(ConditionGroup.or());
