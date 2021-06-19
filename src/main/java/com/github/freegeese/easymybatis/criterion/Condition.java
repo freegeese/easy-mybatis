@@ -2,40 +2,25 @@ package com.github.freegeese.easymybatis.criterion;
 
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 /**
- * 条件
+ * SQL的一个条件语句
+ * <p> 跟在 where 后面的一个and或者or条件
  */
 @Getter
 public class Condition {
-    private List<Expression> expressions;
+    private Expression expression;
     private Join join;
 
-    public static Condition or() {
-        return create(Join.or);
+    public static Condition or(Expression expression) {
+        return new Condition(expression, Join.or);
     }
 
-    public static Condition and() {
-        return create(Join.and);
+    public static Condition and(Expression expression) {
+        return new Condition(expression, Join.and);
     }
 
-    private static Condition create(Join join) {
-        Condition condition = new Condition();
-        condition.join = join;
-        condition.expressions = new ArrayList<>();
-        return condition;
-    }
-
-    public Condition add(Expression expression) {
-        this.expressions.add(expression);
-        return this;
-    }
-
-    public Condition add(Collection<Expression> expressions) {
-        this.expressions.addAll(expressions);
-        return this;
+    private Condition(Expression expression, Join join) {
+        this.expression = expression;
+        this.join = join;
     }
 }

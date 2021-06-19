@@ -25,12 +25,12 @@ public class SqlWrapper {
 
     private Class<?> deleteFrom;
 
-    private List<Condition> conditions;
-    private Condition next;
+    private List<ConditionGroup> conditionGroups;
+    private ConditionGroup nextConditionGroup;
 
     public SqlWrapper() {
-        this.conditions = new ArrayList<>();
-        this.and();
+        this.conditionGroups = new ArrayList<>();
+        this.andGroup();
     }
 
     private SqlWrapper setSelectFrom(Class<?> selectFrom) {
@@ -108,27 +108,66 @@ public class SqlWrapper {
     }
 
     public <T, R> SqlWrapper where(SerializableFunction<T, R> property, Option option, Object value) {
-        return add(new Expression(property, option, value));
+        return and(new Expression(property, option, value));
     }
 
     public <T, R> SqlWrapper where(SerializableFunction<T, R> property, Option option) {
-        return add(new Expression(property, option));
+        return and(new Expression(property, option));
     }
 
-    private SqlWrapper add(Expression expression) {
-        this.next.add(expression);
+    public <T, R> SqlWrapper and(SerializableFunction<T, R> property, Option option, Object value) {
+        return and(new Expression(property, option, value));
+    }
+
+    public <T, R> SqlWrapper and(SerializableFunction<T, R> property, Option option) {
+        return and(new Expression(property, option));
+    }
+
+    public <T, R> SqlWrapper or(SerializableFunction<T, R> property, Option option, Object value) {
+        return or(new Expression(property, option, value));
+    }
+
+    public <T, R> SqlWrapper or(SerializableFunction<T, R> property, Option option) {
+        return or(new Expression(property, option));
+    }
+
+    private SqlWrapper and(Expression expression) {
+        this.nextConditionGroup.add(Condition.and(expression));
         return this;
     }
 
-    public SqlWrapper or() {
-        this.next = Condition.or();
-        this.conditions.add(next);
+    private SqlWrapper or(Expression expression) {
+        this.nextConditionGroup.add(Condition.and(expression));
         return this;
     }
 
-    public SqlWrapper and() {
-        this.next = Condition.and();
-        this.conditions.add(next);
+    public <T, R> SqlWrapper orGroup(SerializableFunction<T, R> property, Option option, Object value) {
+        return orGroup().or(new Expression(property, option, value));
+    }
+
+    public <T, R> SqlWrapper orGroup(SerializableFunction<T, R> property, Option option) {
+        return orGroup().or(new Expression(property, option));
+    }
+
+    public <T, R> SqlWrapper andGroup(SerializableFunction<T, R> property, Option option, Object value) {
+        return andGroup().and(new Expression(property, option, value));
+    }
+
+    public <T, R> SqlWrapper andGroup(SerializableFunction<T, R> property, Option option) {
+        return andGroup().and(new Expression(property, option));
+    }
+
+    private SqlWrapper orGroup() {
+        return addGroup(ConditionGroup.or());
+    }
+
+    private SqlWrapper andGroup() {
+        return addGroup(ConditionGroup.and());
+    }
+
+    private SqlWrapper addGroup(ConditionGroup group) {
+        this.nextConditionGroup = group;
+        this.conditionGroups.add(nextConditionGroup);
         return this;
     }
 
@@ -145,14 +184,19 @@ public class SqlWrapper {
         Map<String, MetaEntityClass.ResultMapping> getMethodAndResultMappingMap = metaEntityClass.getGetMethodAndResultMappingMap();
         StringBuilder sql = new StringBuilder(result.getSql());
 
-        List<String> conditionItems = new ArrayList<>();
-        for (int i = 0; i < conditions.size(); i++) {
-            Condition condition = conditions.get(i);
 
-            List<Expression> expressions = condition.getExpressions();
-            List<String> expressionItems = new ArrayList<>(expressions.size());
-            for (int j = 0; j < expressions.size(); j++) {
-                Expression expression = expressions.get(j);
+        List<String> groupSqls = new ArrayList<>();
+        for (int i = 0; i < conditionGroups.size(); i++) {
+            // 一组条件
+            ConditionGroup group = conditionGroups.get(i);
+            List<Condition> conditions = group.getConditions();
+            List<String> conditionSqls = new ArrayList<>(conditions.size());
+
+            for (int j = 0; j < conditions.size(); j++) {
+                Condition condition = conditions.get(j);
+                Expression expression = condition.getExpression();
+                Join join = condition.getJoin();
+
                 Option option = expression.getOption();
                 Object value = expression.getValue();
 
@@ -173,34 +217,43 @@ public class SqlWrapper {
                     String highKey = key + "_high";
                     result.addParameter(lowKey, low);
                     result.addParameter(highKey, high);
-                    expressionItems.add(Joiner.on(" ").join(column, option.format(toPlaceholder(lowKey), toPlaceholder(highKey))));
+                    conditionSqls.add(Joiner.on(" ").join(column, option.format(toPlaceholder(lowKey), toPlaceholder(highKey))));
                     continue;
                 }
 
                 result.addParameter(key, value);
 
                 if (option == Option.in) {
-                    expressionItems.add(Joiner.on(" ").join(column, IntStream.range(0, ((Collection<?>) value).size()).mapToObj(v -> toPlaceholder(key + ".[" + v + "]")).collect(Collectors.joining(","))));
+                    appendSql(conditionSqls, join, Joiner.on(" ").join(column, IntStream.range(0, ((Collection<?>) value).size()).mapToObj(v -> toPlaceholder(key + ".[" + v + "]")).collect(Collectors.joining(","))));
                     continue;
                 }
 
                 if (option == Option.isNull || option == Option.isNotNull) {
-                    expressionItems.add(Joiner.on(" ").join(column, option.getValue()));
+                    appendSql(conditionSqls, join, Joiner.on(" ").join(column, option.getValue()));
                     continue;
                 }
 
-                expressionItems.add(Joiner.on(" ").join(column, option.format(placeholder)));
+                appendSql(conditionSqls, join, Joiner.on(" ").join(column, option.format(placeholder)));
             }
 
-            String join = condition.getJoin().name();
-            conditionItems.add((conditionItems.isEmpty() ? "where" : join) + " (" + Joiner.on(" " + join + " ").join(expressionItems) + ")");
+            // 记录每一组条件
+            String groupSql = Joiner.on(" ").join(conditionSqls);
+            if (groupSqls.isEmpty()) {
+                groupSqls.add(groupSql);
+                continue;
+            }
+            groupSqls.add(group.getJoin().name() + " (" + groupSql + ")");
         }
 
-        if (!conditionItems.isEmpty()) {
-            sql.append(" ").append(Joiner.on(" ").join(conditionItems));
+        if (!groupSqls.isEmpty()) {
+            sql.append(" where ").append(Joiner.on(" ").join(groupSqls));
         }
 
         return result.setSql(sql.toString());
+    }
+
+    private void appendSql(List<String> sqls, Join join, String sql) {
+        sqls.add(sqls.isEmpty() ? sql : join.name() + " " + sql);
     }
 
     /**

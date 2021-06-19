@@ -19,9 +19,9 @@ class SqlWrapperMapperTests {
         mapper.selectByWrapper(
                 SqlWrapper
                         .select(User::getId, User::getName, User::getPhone)
-                        .where(User::getId, Option.eq, 1)
-                        .or()
-                        .where(User::getPhone, Option.fullLike, "133")
+                        .where(User::getId, Option.gt, 1000)
+                        .orGroup(User::getPhone, Option.fullLike, "133")
+                        .and(User::getName, Option.fullLike.not(), "张")
                         .unwrap()
         );
     }
