@@ -382,7 +382,10 @@
     </profiles>
 
     <!--
-        mvn versions:set -DnewVersion=1.0-SNAPSHOT -DprocessAllModules=true -DallowSnapshots=true -DgenerateBackupPoms=false
+        修改版本
+        mvn versions:set -DnewVersion=1.0.0-SNAPSHOT -DprocessAllModules=true -DallowSnapshots=true -DgenerateBackupPoms=false
+        发布
+        mvn -T 1C clean deploy -e -P release
     -->
     <modules>
         <module>easy-mybatis-core</module>

@@ -30,8 +30,17 @@ configuration.init(sqlSessionFactory);
 ```xml
 <dependency>
     <groupId>com.github.freegeese</groupId>
-    <artifactId>easy-mybatis</artifactId>
-    <version>1.0</version>
+    <artifactId>easy-mybatis-core</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+* spring
+```xml
+<dependency>
+    <groupId>com.github.freegeese</groupId>
+    <artifactId>easy-mybatis-spring</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -40,6 +49,6 @@ configuration.init(sqlSessionFactory);
 <dependency>
     <groupId>com.github.freegeese</groupId>
     <artifactId>easy-mybatis-spring-boot-starter</artifactId>
-    <version>1.0</version>
+    <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
