@@ -1,7 +1,7 @@
 package com.github.freegeese.easymybatis.test;
 
-import com.github.freegeese.easymybatis.criterion.Option;
-import com.github.freegeese.easymybatis.criterion.SqlWrapper;
+import com.github.freegeese.easymybatis.core.criterion.Option;
+import com.github.freegeese.easymybatis.core.criterion.SqlWrapper;
 import com.github.freegeese.easymybatis.test.db1.domain.User;
 import com.github.freegeese.easymybatis.test.db1.mapper.UserMapper;
 import org.junit.jupiter.api.Test;

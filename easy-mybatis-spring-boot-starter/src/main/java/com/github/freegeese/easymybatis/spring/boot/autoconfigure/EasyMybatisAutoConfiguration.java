@@ -15,7 +15,7 @@
  */
 package com.github.freegeese.easymybatis.spring.boot.autoconfigure;
 
-import com.github.freegeese.easymybatis.EasyMybatisConfiguration;
+import com.github.freegeese.easymybatis.core.EasyMybatisConfiguration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;

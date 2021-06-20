@@ -1,7 +1,7 @@
 package com.github.freegeese.easymybatis.test.configuration;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.github.freegeese.easymybatis.interceptor.DateableInterceptor;
+import com.github.freegeese.easymybatis.core.interceptor.DateableInterceptor;
 import com.github.pagehelper.PageInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;

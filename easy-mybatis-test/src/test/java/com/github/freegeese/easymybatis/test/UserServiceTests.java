@@ -2,9 +2,8 @@ package com.github.freegeese.easymybatis.test;
 
 import cn.binarywang.tools.generator.ChineseMobileNumberGenerator;
 import cn.binarywang.tools.generator.ChineseNameGenerator;
-import com.alibaba.fastjson.JSON;
-import com.github.freegeese.easymybatis.domain.Pageable;
-import com.github.freegeese.easymybatis.domain.Pagination;
+import com.github.freegeese.easymybatis.core.domain.Pageable;
+import com.github.freegeese.easymybatis.core.domain.Pagination;
 import com.github.freegeese.easymybatis.test.db1.domain.User;
 import com.github.freegeese.easymybatis.test.db1.service.UserService;
 import com.google.common.collect.Maps;
@@ -86,7 +85,7 @@ class UserServiceTests {
         parameterMap.put("name", "like '%张%'");
         parameterMap.put("phone", "like '133%'");
         List<User> users = service.selectByParameterMap(parameterMap);
-        System.out.println(JSON.toJSONString(users, true));
+        System.out.println(users.size());
     }
 
     @Test
