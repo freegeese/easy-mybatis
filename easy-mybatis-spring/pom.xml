@@ -4,11 +4,12 @@
     <parent>
         <groupId>com.github.freegeese</groupId>
         <artifactId>easy-mybatis-parent</artifactId>
-        <version>1.0</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>easy-mybatis-spring</artifactId>
+    <packaging>jar</packaging>
     <name>easy-mybatis-spring</name>
 
     <dependencies>
