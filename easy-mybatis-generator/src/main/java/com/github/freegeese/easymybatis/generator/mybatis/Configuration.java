@@ -14,34 +14,27 @@ import static freemarker.template.Configuration.VERSION_2_3_28;
 /**
  * 配置信息
  *
- * @author Guangyong Zhang
+ * @author zhangguangyong
  * @since 1.0
  */
 @Data
 public class Configuration {
     @Data
     public static class ExtProperty {
-        private Auditable auditable = new Auditable();
         private Dateable dateable = new Dateable();
         private Treeable treeable = new Treeable();
 
         @Data
-        public static class Auditable {
-            private String extCreatedBy = "extCreatedBy";
-            private String extLastModifiedBy = "extLastModifiedBy";
-        }
-
-        @Data
         public static class Dateable {
-            private String extCreatedDate = "extCreatedDate";
-            private String extLastModifiedDate = "extLastModifiedDate";
+            private String createdDate = "createdDate";
+            private String lastModifiedDate = "lastModifiedDate";
         }
 
         @Data
         public static class Treeable {
-            private String extNodeParentId = "extNodeParentId";
-            private String extNodePath = "extNodePath";
-            private String extNodeSort = "extNodeSort";
+            private String parentId = "parentId";
+            private String path = "path";
+            private String sort = "sort";
         }
     }
 

@@ -1,9 +1,9 @@
 package com.github.freegeese.easymybatis.generator.database;
 
 import com.alibaba.fastjson.JSON;
-import com.nuochen.framework.autocoding.generator.database.metadata.Column;
-import com.nuochen.framework.autocoding.generator.database.metadata.PrimaryKey;
-import com.nuochen.framework.autocoding.generator.database.metadata.Table;
+import com.github.freegeese.easymybatis.generator.database.metadata.Column;
+import com.github.freegeese.easymybatis.generator.database.metadata.PrimaryKey;
+import com.github.freegeese.easymybatis.generator.database.metadata.Table;
 import lombok.Getter;
 
 import java.lang.reflect.Method;

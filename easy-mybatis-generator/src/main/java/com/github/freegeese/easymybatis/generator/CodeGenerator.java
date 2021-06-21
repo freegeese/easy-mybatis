@@ -1,8 +1,8 @@
 package com.github.freegeese.easymybatis.generator;
 
+import com.github.freegeese.easymybatis.generator.util.FileReplacer;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import com.nuochen.framework.component.commons.FileReplacer;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import java.util.Objects;
 /**
  * 代码生成器
  *
- * @author Guangyong Zhang
+ * @author zhangguangyong
  * @since 1.0
  */
 @Slf4j

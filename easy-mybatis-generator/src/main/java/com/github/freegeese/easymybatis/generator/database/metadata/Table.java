@@ -1,11 +1,11 @@
 package com.github.freegeese.easymybatis.generator.database.metadata;
 
-import com.google.common.collect.Maps;
 import lombok.Data;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Data
 public class Table {
@@ -24,18 +24,10 @@ public class Table {
     private List<PrimaryKey> primaryKeyList;
 
     public Map<String, Column> getColumnMetaDataMap() {
-        final HashMap<String, Column> map = Maps.newHashMap();
-        for (Column column : columnList) {
-            map.put(column.getColumnName(), column);
-        }
-        return map;
+        return columnList.stream().collect(Collectors.toMap(Column::getColumnName, Function.identity()));
     }
 
     public Map<String, PrimaryKey> getPrimaryKeyMetaDataMap() {
-        final HashMap<String, PrimaryKey> map = Maps.newHashMap();
-        for (PrimaryKey primaryKey : primaryKeyList) {
-            map.put(primaryKey.getColumnName(), primaryKey);
-        }
-        return map;
+        return primaryKeyList.stream().collect(Collectors.toMap(PrimaryKey::getColumnName, Function.identity()));
     }
 }

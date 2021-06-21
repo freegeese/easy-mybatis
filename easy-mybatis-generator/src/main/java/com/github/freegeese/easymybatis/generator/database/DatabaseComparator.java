@@ -2,11 +2,11 @@ package com.github.freegeese.easymybatis.generator.database;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.github.freegeese.easymybatis.generator.database.metadata.Column;
+import com.github.freegeese.easymybatis.generator.database.metadata.Table;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
-import com.nuochen.framework.autocoding.generator.database.metadata.Column;
-import com.nuochen.framework.autocoding.generator.database.metadata.Table;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 

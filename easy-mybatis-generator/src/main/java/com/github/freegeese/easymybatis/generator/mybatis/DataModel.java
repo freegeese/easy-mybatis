@@ -2,18 +2,16 @@ package com.github.freegeese.easymybatis.generator.mybatis;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.github.freegeese.easymybatis.core.domain.Dateable;
+import com.github.freegeese.easymybatis.core.domain.Treeable;
+import com.github.freegeese.easymybatis.core.mapper.BaseMapper;
+import com.github.freegeese.easymybatis.core.mapper.TreeableMapper;
+import com.github.freegeese.easymybatis.spring.service.BaseService;
+import com.github.freegeese.easymybatis.spring.service.TreeableService;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
-import com.nuochen.framework.autocoding.domain.Auditable;
-import com.nuochen.framework.autocoding.domain.Dateable;
-import com.nuochen.framework.autocoding.domain.Entity;
-import com.nuochen.framework.autocoding.domain.Treeable;
-import com.nuochen.framework.autocoding.domain.mybatis.BaseRepository;
-import com.nuochen.framework.autocoding.domain.mybatis.BaseService;
-import com.nuochen.framework.autocoding.domain.mybatis.TreeableRepository;
-import com.nuochen.framework.autocoding.domain.mybatis.TreeableService;
 import lombok.Data;
 
 import java.util.*;
@@ -22,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * 数据模型（用于配合模板生成代码）
  *
- * @author Guangyong Zhang
+ * @author zhangguangyong
  * @since 1.0
  */
 @Data
@@ -98,7 +96,7 @@ public class DataModel {
         List<Class> modelImplementTypes = getModelImplementTypes();
 
         for (Class type : modelImplementTypes) {
-            Object ext = (type == Auditable.class) ? extProperty.getAuditable() : (type == Dateable.class) ? extProperty.getDateable() : (type == Treeable.class) ? extProperty.getTreeable() : null;
+            Object ext = (type == Dateable.class) ? extProperty.getDateable() : (type == Treeable.class) ? extProperty.getTreeable() : null;
             if (Objects.isNull(ext)) {
                 continue;
             }
@@ -152,14 +150,12 @@ public class DataModel {
     @SuppressWarnings("rawtypes")
     public List<Class> getModelImplementTypes() {
         if (Objects.isNull(this.extTypes) || this.extTypes.isEmpty()) {
-            return Collections.singletonList(Entity.class);
+            return null;
         }
 
-        List<Class<?>> types = Arrays.asList(Auditable.class, Dateable.class, Treeable.class);
+        List<Class<?>> types = Arrays.asList(Dateable.class, Treeable.class);
         List<Class> modelTypes = types.stream().filter(v -> this.extTypes.contains(v.getSimpleName())).collect(Collectors.toList());
-        if (modelTypes.stream().filter(Entity.class::isAssignableFrom).count() == 0) {
-            modelTypes.add(0, Entity.class);
-        }
+
         return modelTypes;
     }
 
@@ -179,12 +175,7 @@ public class DataModel {
     public String getModelImplements() {
         final String primaryKeyJavaTypeSimpleName = getPrimaryKey().getJavaType().getSimpleName();
         return Joiner.on(",").join(
-                getModelImplementTypes().stream().map(type -> {
-                    if (Entity.class.isAssignableFrom(type)) {
-                        return type.getSimpleName() + "<" + primaryKeyJavaTypeSimpleName + ">";
-                    }
-                    return type.getSimpleName();
-                }).collect(Collectors.toList())
+                getModelImplementTypes().stream().map(Class::getSimpleName).collect(Collectors.toList())
         );
     }
 
@@ -215,14 +206,11 @@ public class DataModel {
     @SuppressWarnings("rawtypes")
     public Class getRepositoryExtendType() {
         for (Class type : getModelImplementTypes()) {
-            if (Entity.class == type) {
-                continue;
-            }
             if (Treeable.class == type) {
-                return TreeableRepository.class;
+                return TreeableMapper.class;
             }
         }
-        return BaseRepository.class;
+        return BaseMapper.class;
     }
 
     public String getRepositoryExtends() {
@@ -257,9 +245,6 @@ public class DataModel {
     @SuppressWarnings("rawtypes")
     public Class getServiceExtendType() {
         for (Class type : getModelImplementTypes()) {
-            if (Entity.class == type) {
-                continue;
-            }
             if (Treeable.class == type) {
                 return TreeableService.class;
             }

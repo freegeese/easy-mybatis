@@ -1,13 +1,13 @@
 package com.github.freegeese.easymybatis.generator.mybatis;
 
 import com.alibaba.fastjson.JSON;
+import com.github.freegeese.easymybatis.generator.CodeGenerator;
+import com.github.freegeese.easymybatis.generator.database.DatabaseMetaDataHelper;
+import com.github.freegeese.easymybatis.generator.database.JdbcConnectionBuilder;
+import com.github.freegeese.easymybatis.generator.database.metadata.Column;
+import com.github.freegeese.easymybatis.generator.database.metadata.PrimaryKey;
+import com.github.freegeese.easymybatis.generator.database.metadata.Table;
 import com.google.common.base.CaseFormat;
-import com.nuochen.framework.autocoding.generator.CodeGenerator;
-import com.nuochen.framework.autocoding.generator.database.DatabaseMetaDataHelper;
-import com.nuochen.framework.autocoding.generator.database.JdbcConnectionBuilder;
-import com.nuochen.framework.autocoding.generator.database.metadata.Column;
-import com.nuochen.framework.autocoding.generator.database.metadata.PrimaryKey;
-import com.nuochen.framework.autocoding.generator.database.metadata.Table;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.type.JdbcType;
 
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 /**
  * Mybatis 代码生成器
  *
- * @author Guangyong Zhang
+ * @author zhangguangyong
  * @since 1.0
  */
 @Slf4j
@@ -220,16 +220,12 @@ public class MybatisGenerator {
 
                     List<String> extTypes = new ArrayList<>();
                     Configuration.ExtProperty.Dateable dateable = extProperty.getDateable();
-                    if (props.containsAll(Arrays.asList(dateable.getExtCreatedDate(), dateable.getExtLastModifiedDate()))) {
+                    if (props.containsAll(Arrays.asList(dateable.getCreatedDate(), dateable.getLastModifiedDate()))) {
                         extTypes.add(dateable.getClass().getSimpleName());
                     }
                     Configuration.ExtProperty.Treeable treeable = extProperty.getTreeable();
-                    if (props.containsAll(Arrays.asList(treeable.getExtNodeParentId(), treeable.getExtNodePath(), treeable.getExtNodeSort()))) {
+                    if (props.containsAll(Arrays.asList(treeable.getParentId(), treeable.getPath(), treeable.getSort()))) {
                         extTypes.add(treeable.getClass().getSimpleName());
-                    }
-                    Configuration.ExtProperty.Auditable auditable = extProperty.getAuditable();
-                    if (props.containsAll(Arrays.asList(auditable.getExtCreatedBy(), auditable.getExtLastModifiedBy()))) {
-                        extTypes.add(auditable.getClass().getSimpleName());
                     }
                     if (!extTypes.isEmpty()) {
                         dataModel.setExtTypes(extTypes);
