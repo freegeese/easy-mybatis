@@ -79,8 +79,6 @@
         <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
         <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
-
-        <easy-mybatis.version>1.0</easy-mybatis.version>
     </properties>
 
     <!-- 依赖 -->
@@ -89,12 +87,12 @@
             <dependency>
                 <groupId>com.github.freegeese</groupId>
                 <artifactId>easy-mybatis-core</artifactId>
-                <version>${easy-mybatis.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.freegeese</groupId>
                 <artifactId>easy-mybatis-spring</artifactId>
-                <version>${easy-mybatis.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!-- import -->
@@ -391,5 +389,6 @@
         <module>easy-mybatis-core</module>
         <module>easy-mybatis-spring</module>
         <module>easy-mybatis-spring-boot-starter</module>
+        <module>easy-mybatis-generator</module>
     </modules>
 </project>
