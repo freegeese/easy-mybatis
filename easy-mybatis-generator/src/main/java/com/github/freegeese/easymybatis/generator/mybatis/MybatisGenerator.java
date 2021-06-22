@@ -1,21 +1,19 @@
 package com.github.freegeese.easymybatis.generator.mybatis;
 
 import com.alibaba.fastjson.JSON;
-import com.github.freegeese.easymybatis.generator.CodeGenerator;
+import com.github.freegeese.easymybatis.generator.Generator;
 import com.github.freegeese.easymybatis.generator.database.DatabaseMetaDataHelper;
 import com.github.freegeese.easymybatis.generator.database.JdbcConnectionBuilder;
 import com.github.freegeese.easymybatis.generator.database.metadata.Column;
 import com.github.freegeese.easymybatis.generator.database.metadata.PrimaryKey;
 import com.github.freegeese.easymybatis.generator.database.metadata.Table;
+import com.github.freegeese.easymybatis.generator.util.IoUtils;
 import com.google.common.base.CaseFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.type.JdbcType;
 
 import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.util.*;
@@ -29,24 +27,14 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class MybatisGenerator {
-    private Configuration configuration;
+    private MybatisConfiguration configuration;
 
-    public MybatisGenerator(Configuration configuration) {
+    public MybatisGenerator(MybatisConfiguration configuration) {
         this.configuration = configuration;
     }
 
-    /**
-     * 创建代码生成器，通过传递配置文件
-     *
-     * @param path
-     * @return
-     */
-    public static MybatisGenerator create(Path path) {
-        try {
-            return create(new String(Files.readAllBytes(path)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public MybatisConfiguration getConfiguration() {
+        return configuration;
     }
 
     /**
@@ -55,8 +43,8 @@ public class MybatisGenerator {
      * @param json
      * @return
      */
-    private static MybatisGenerator create(String json) {
-        final Map<String, Object> properties = JSON.parseObject(json, Configuration.class).getProperties();
+    public static MybatisGenerator create(String json) {
+        final Map<String, Object> properties = JSON.parseObject(json, MybatisConfiguration.class).getProperties();
         final Properties systemProperties = System.getProperties();
         for (Map.Entry<String, Object> entry : properties.entrySet()) {
             String value = (String) entry.getValue();
@@ -69,9 +57,7 @@ public class MybatisGenerator {
             json = json.replace("{" + entry.getKey() + "}", entry.getValue().toString());
         }
         json = json.replace("\\", "/");
-        final Configuration configuration = JSON.parseObject(json, Configuration.class);
-        configuration.setTemplateDirectory(new File(properties.get("templateDirectory").toString()));
-        return create(configuration);
+        return create(JSON.parseObject(json, MybatisConfiguration.class));
     }
 
     /**
@@ -80,11 +66,8 @@ public class MybatisGenerator {
      * @param configuration
      * @return
      */
-    public static MybatisGenerator create(Configuration configuration) {
-        if (Objects.isNull(configuration.getExtProperty())) {
-            configuration.setExtProperty(new Configuration.ExtProperty());
-        }
-        return new MybatisGenerator(configuration);
+    public static MybatisGenerator create(MybatisConfiguration configuration) {
+        return new MybatisGenerator(configuration.postConstruct());
     }
 
     /**
@@ -93,7 +76,7 @@ public class MybatisGenerator {
     public void generate() {
         try {
             // JDBC
-            final Configuration.Jdbc jdbc = configuration.getJdbc();
+            final MybatisConfiguration.Jdbc jdbc = configuration.getJdbc();
             final Connection connection = JdbcConnectionBuilder.create(jdbc.getUrl(), jdbc.getDriver())
                     .user(jdbc.getUser())
                     .password(jdbc.getPassword())
@@ -111,7 +94,7 @@ public class MybatisGenerator {
 
             // 过滤(匹配配置信息里面的Table)
             final String tableNamePattern = configuration.getTableNamePattern();
-            final Map<String, Configuration.Table> configTableMap = configuration.getTableMap();
+            final Map<String, MybatisConfiguration.Table> configTableMap = configuration.getTableMap();
             final List<Table> filteredDbTables = dbTables.stream().filter(table -> {
                 final String tableName = table.getTableName();
                 if (!configTableMap.isEmpty()) {
@@ -126,9 +109,9 @@ public class MybatisGenerator {
 
             // 转换成Mybatis生成代码所需要的数据结构
             final List<DataModel> dataModels = filteredDbTables.stream().map(dbTable -> {
-                Configuration.Table configTable = configTableMap.get(dbTable.getTableName());
+                MybatisConfiguration.Table configTable = configTableMap.get(dbTable.getTableName());
                 if (Objects.isNull(configTable)) {
-                    configTable = new Configuration.Table();
+                    configTable = new MybatisConfiguration.Table();
                     configTable.setTableName(dbTable.getTableName());
                 }
 
@@ -148,25 +131,25 @@ public class MybatisGenerator {
                 dataModel.setExtTypes(configTable.getExtTypes());
 
                 // Model
-                final Configuration.GenerateJava model = configuration.getModel();
+                final MybatisConfiguration.GenerateJava model = configuration.getModel();
                 if (Objects.nonNull(model)) {
                     dataModel.setModelName(configTable.getModelName());
                     dataModel.setModelPackage(model.getPackageName());
                 }
 
-                // Repository
-                Configuration.GenerateJava repository = configuration.getRepository();
-                if (Objects.nonNull(repository)) {
-                    String repositoryName = configTable.getRepositoryName();
+                // Mapper
+                MybatisConfiguration.GenerateJava mapper = configuration.getMapper();
+                if (Objects.nonNull(mapper)) {
+                    String repositoryName = configTable.getMapperName();
                     if (Objects.isNull(repositoryName)) {
-                        repositoryName = repository.getPrefix() + dataModel.getModelName() + repository.getSuffix();
+                        repositoryName = mapper.getPrefix() + dataModel.getModelName() + mapper.getSuffix();
                     }
                     dataModel.setRepositoryName(repositoryName);
-                    dataModel.setRepositoryPackage(repository.getPackageName());
+                    dataModel.setMapperPackage(mapper.getPackageName());
                 }
 
                 // Service
-                Configuration.GenerateJava service = configuration.getService();
+                MybatisConfiguration.GenerateJava service = configuration.getService();
                 if (Objects.nonNull(service)) {
                     String serviceName = configTable.getServiceName();
                     if (Objects.isNull(serviceName)) {
@@ -176,27 +159,17 @@ public class MybatisGenerator {
                     dataModel.setServicePackage(service.getPackageName());
                 }
 
-                // Repository Sql
-                final Configuration.GenerateXml repositorySql = configuration.getRepositorySql();
-                if (Objects.nonNull(repositorySql)) {
-                    String repositorySqlName = configTable.getRepositorySqlName();
+                // MapperXml
+                final MybatisConfiguration.GenerateXml mapperXml = configuration.getMapperXml();
+                if (Objects.nonNull(mapperXml)) {
+                    String repositorySqlName = configTable.getMapperXmlName();
                     if (Objects.isNull(repositorySqlName)) {
-                        repositorySqlName = repositorySql.getPrefix() + dataModel.getModelName() + repositorySql.getSuffix();
+                        repositorySqlName = mapperXml.getPrefix() + dataModel.getModelName() + mapperXml.getSuffix();
                     }
                     dataModel.setRepositorySqlName(repositorySqlName);
                 }
 
-                // Custom Repository Sql
-                final Configuration.GenerateXml repositoryCustomSql = configuration.getRepositoryCustomSql();
-                if (Objects.nonNull(repositoryCustomSql)) {
-                    String customRepositorySqlName = configTable.getCustomRepositorySqlName();
-                    if (Objects.isNull(customRepositorySqlName)) {
-                        customRepositorySqlName = repositoryCustomSql.getPrefix() + dataModel.getModelName() + repositoryCustomSql.getSuffix();
-                    }
-                    dataModel.setCustomRepositorySqlName(customRepositorySqlName);
-                }
-
-                final Map<String, Configuration.Column> configColumnMap = configTable.getColumnMap();
+                final Map<String, MybatisConfiguration.Column> configColumnMap = configTable.getColumnMap();
                 // 列
                 dataModel.setColumns(
                         dbTable.getColumnList().stream().map(dbColumn -> {
@@ -216,14 +189,14 @@ public class MybatisGenerator {
                 // 扩展类型自动匹配
                 if (Objects.isNull(dataModel.getExtTypes()) || dataModel.getExtTypes().isEmpty()) {
                     List<String> props = dataModel.getColumns().stream().map(DataModel.Column::getProperty).collect(Collectors.toList());
-                    Configuration.ExtProperty extProperty = dataModel.getExtProperty();
+                    MybatisConfiguration.ExtProperty extProperty = dataModel.getExtProperty();
 
                     List<String> extTypes = new ArrayList<>();
-                    Configuration.ExtProperty.Dateable dateable = extProperty.getDateable();
+                    MybatisConfiguration.ExtProperty.Dateable dateable = extProperty.getDateable();
                     if (props.containsAll(Arrays.asList(dateable.getCreatedDate(), dateable.getLastModifiedDate()))) {
                         extTypes.add(dateable.getClass().getSimpleName());
                     }
-                    Configuration.ExtProperty.Treeable treeable = extProperty.getTreeable();
+                    MybatisConfiguration.ExtProperty.Treeable treeable = extProperty.getTreeable();
                     if (props.containsAll(Arrays.asList(treeable.getParentId(), treeable.getPath(), treeable.getSort()))) {
                         extTypes.add(treeable.getClass().getSimpleName());
                     }
@@ -250,18 +223,15 @@ public class MybatisGenerator {
             log.info("模板数据 -> {}", JSON.toJSONString(dataModels, true));
 
             for (DataModel dataModel : dataModels) {
-                // 暂时不支持没有主键的表，或者有多个主键的表
-                if (Objects.isNull(dataModel.getPrimaryKey())) {
-                    log.warn("数据库表【{}】没有主键列，不支持代码生成", dataModel.getTableName());
-                    continue;
-                }
                 dataModel.setProperties(configuration.getProperties());
                 dataModel.setExtProperty(configuration.getExtProperty());
+                dataModel.setKeepMarkStart(configuration.getKeepMarkStart());
+                dataModel.setKeepMarkEnd(configuration.getKeepMarkEnd());
+
                 generateModel(dataModel);
-                generateRepository(dataModel);
-                generateRepositorySql(dataModel);
+                generateMapper(dataModel);
+                generateMapperXml(dataModel);
                 generateService(dataModel);
-                generateCustomRepositorySql(dataModel);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -275,7 +245,7 @@ public class MybatisGenerator {
      * @param dataModel
      */
     private void generateModel(DataModel dataModel) {
-        final Configuration.GenerateJava model = configuration.getModel();
+        final MybatisConfiguration.GenerateJava model = configuration.getModel();
         if (Objects.isNull(model)) {
             return;
         }
@@ -283,16 +253,16 @@ public class MybatisGenerator {
     }
 
     /**
-     * 生成 Repository
+     * 生成 Mapper
      *
      * @param dataModel
      */
-    private void generateRepository(DataModel dataModel) {
-        final Configuration.GenerateJava repository = configuration.getRepository();
+    private void generateMapper(DataModel dataModel) {
+        final MybatisConfiguration.GenerateJava repository = configuration.getMapper();
         if (Objects.isNull(repository)) {
             return;
         }
-        generateFile(dataModel, repository, dataModel.getRepositoryName());
+        generateFile(dataModel, repository, dataModel.getMapperName());
     }
 
     /**
@@ -301,7 +271,7 @@ public class MybatisGenerator {
      * @param dataModel
      */
     private void generateService(DataModel dataModel) {
-        final Configuration.GenerateJava service = configuration.getService();
+        final MybatisConfiguration.GenerateJava service = configuration.getService();
         if (Objects.isNull(service)) {
             return;
         }
@@ -309,29 +279,16 @@ public class MybatisGenerator {
     }
 
     /**
-     * 生成 Repository Sql
+     * 生成 Mapper.xml
      *
      * @param dataModel
      */
-    private void generateRepositorySql(DataModel dataModel) {
-        final Configuration.GenerateXml repositorySql = configuration.getRepositorySql();
+    private void generateMapperXml(DataModel dataModel) {
+        final MybatisConfiguration.GenerateXml repositorySql = configuration.getMapperXml();
         if (Objects.isNull(repositorySql)) {
             return;
         }
         generateFile(dataModel, repositorySql, dataModel.getRepositorySqlName());
-    }
-
-    /**
-     * 生成 Custom Repository Sql
-     *
-     * @param dataModel
-     */
-    private void generateCustomRepositorySql(DataModel dataModel) {
-        final Configuration.GenerateXml repositoryCustomSql = configuration.getRepositoryCustomSql();
-        if (Objects.isNull(repositoryCustomSql)) {
-            return;
-        }
-        generateFile(dataModel, repositoryCustomSql, dataModel.getCustomRepositorySqlName());
     }
 
     /**
@@ -341,11 +298,12 @@ public class MybatisGenerator {
      * @param generateFile
      * @param fileName
      */
-    private void generateFile(DataModel dataModel, Configuration.GenerateFile generateFile, String fileName) {
-        final String template = generateFile.getTemplate();
-        final File output = new File(generateFile.getOutputDirectory(), fileName + generateFile.getExtension());
+    private void generateFile(DataModel dataModel, MybatisConfiguration.GenerateFile generateFile, String fileName) {
+        String template = IoUtils.readString(getClass().getClassLoader().getResourceAsStream(generateFile.getName()));
+        File output = new File(generateFile.getOutputDirectory(), fileName + generateFile.getExtension());
         dataModel.setOutputFileExists(output.exists());
-        CodeGenerator.create(configuration.getTemplateConfiguration())
+
+        Generator.create()
                 .keepMarkStart(configuration.getKeepMarkStart())
                 .keepMarkEnd(configuration.getKeepMarkEnd())
                 .override(generateFile.isOverride())

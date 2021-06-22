@@ -1,0 +1,55 @@
+{
+  "properties": {
+    "sourceDirectory": "${user.dir}/src/test/java",
+    "resourcesDirectory": "${user.dir}/src/test/resources",
+    "basePackage": "com.github.freegeese.easymybatis.generator.test",
+    "basePackageDirectory": "com/github/freegeese/easymybatis/generator/test"
+  },
+  "extProperty": {
+    "treeable": {
+      "parentId": "parentId",
+      "path": "path",
+      "sort": "sort"
+    }
+  },
+  "jdbc": {
+    "driver": "com.mysql.jdbc.Driver",
+    "url": "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true",
+    "user": "root",
+    "password": "123456"
+  },
+  "catalog": "test",
+  "schemaPattern": "test",
+  "keepMarkStart": "KEEP_MARK_START",
+  "keepMarkEnd": "KEEP_MARK_END",
+  "model": {
+    "outputDirectory": "{sourceDirectory}/{basePackageDirectory}/model",
+    "packageName": "{basePackage}.model",
+    "override": true
+  },
+  "mapper": {
+    "outputDirectory": "{sourceDirectory}/{basePackageDirectory}/mapper",
+    "packageName": "{basePackage}.mapper",
+    "override": false,
+    "suffix": "Mapper"
+  },
+  "service": {
+    "outputDirectory": "{sourceDirectory}/{basePackageDirectory}/service",
+    "packageName": "{basePackage}.service",
+    "override": false,
+    "suffix": "Service"
+  },
+  "mapperXml": {
+    "outputDirectory": "{resourcesDirectory}/{basePackageDirectory}/mapper",
+    "override": true,
+    "suffix": "Mapper"
+  },
+  "tables": [
+    {
+      "tableName": "user",
+      "extTypes": [
+        "Dateable"
+      ]
+    }
+  ]
+}

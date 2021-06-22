@@ -2,6 +2,9 @@ package com.github.freegeese.easymybatis.generator.mybatis;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.github.freegeese.easymybatis.core.annotation.GeneratedValue;
+import com.github.freegeese.easymybatis.core.annotation.GenerationType;
+import com.github.freegeese.easymybatis.core.annotation.Id;
 import com.github.freegeese.easymybatis.core.domain.Dateable;
 import com.github.freegeese.easymybatis.core.domain.Treeable;
 import com.github.freegeese.easymybatis.core.mapper.BaseMapper;
@@ -16,6 +19,7 @@ import lombok.Data;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 数据模型（用于配合模板生成代码）
@@ -38,7 +42,7 @@ public class DataModel {
     private String modelPackage;
 
     private String repositoryName;
-    private String repositoryPackage;
+    private String mapperPackage;
 
     private String serviceName;
     private String servicePackage;
@@ -50,7 +54,9 @@ public class DataModel {
 
     // 其他属性
     private Map<String, Object> properties;
-    private Configuration.ExtProperty extProperty;
+    private MybatisConfiguration.ExtProperty extProperty;
+    private String keepMarkStart;
+    private String keepMarkEnd;
 
 
     @Data
@@ -80,7 +86,7 @@ public class DataModel {
      *
      * @return
      */
-    public Map<String, String> getPropertyWithColumnMap() {
+    public Map<String, String> getPropertyAndColumnMap() {
         return getColumns().stream().collect(Collectors.toMap(Column::getProperty, Column::getName));
     }
 
@@ -90,9 +96,9 @@ public class DataModel {
      * @return
      */
     public Map<String, String> getOverriddenExtPropertyMap() {
-        final Configuration.ExtProperty extProperty = getExtProperty();
+        final MybatisConfiguration.ExtProperty extProperty = getExtProperty();
         Map<String, String> overriddenExtPropertyMap = Maps.newHashMap();
-        Set<String> propertyNames = getPropertyWithColumnMap().keySet();
+        Set<String> propertyNames = getPropertyAndColumnMap().keySet();
         List<Class> modelImplementTypes = getModelImplementTypes();
 
         for (Class type : modelImplementTypes) {
@@ -130,7 +136,7 @@ public class DataModel {
      * @return
      */
     public String getColumnNames() {
-        return String.join(",", getColumns().stream().map(Column::getName).collect(Collectors.toList()));
+        return getColumns().stream().map(Column::getName).collect(Collectors.joining(","));
     }
 
     /**
@@ -139,7 +145,7 @@ public class DataModel {
      * @return
      */
     public String getColumnNamesWithoutPrimaryKey() {
-        return String.join(",", getColumnsWithoutPrimaryKey().stream().map(Column::getName).collect(Collectors.toList()));
+        return getColumnsWithoutPrimaryKey().stream().map(Column::getName).collect(Collectors.joining(","));
     }
 
     /**
@@ -152,11 +158,7 @@ public class DataModel {
         if (Objects.isNull(this.extTypes) || this.extTypes.isEmpty()) {
             return null;
         }
-
-        List<Class<?>> types = Arrays.asList(Dateable.class, Treeable.class);
-        List<Class> modelTypes = types.stream().filter(v -> this.extTypes.contains(v.getSimpleName())).collect(Collectors.toList());
-
-        return modelTypes;
+        return Stream.of(Dateable.class, Treeable.class).filter(v -> this.extTypes.contains(v.getSimpleName())).collect(Collectors.toList());
     }
 
     public List<String> getModelImportTypes() {
@@ -169,42 +171,48 @@ public class DataModel {
         }
         // 继承的接口
         importTypes.addAll(getModelImplementTypes().stream().map(Class::getName).collect(Collectors.toList()));
+
+        if (Objects.nonNull(primaryKey)) {
+            importTypes.add(Id.class.getName());
+            if (Objects.equals(primaryKey.getAutoincrement(), true)) {
+                importTypes.add(GeneratedValue.class.getName());
+                importTypes.add(GenerationType.class.getName());
+            }
+        }
+
         return new ArrayList<>(importTypes);
     }
 
     public String getModelImplements() {
-        final String primaryKeyJavaTypeSimpleName = getPrimaryKey().getJavaType().getSimpleName();
-        return Joiner.on(",").join(
-                getModelImplementTypes().stream().map(Class::getSimpleName).collect(Collectors.toList())
-        );
+        return getModelImplementTypes().stream().map(Class::getSimpleName).collect(Collectors.joining(","));
     }
 
-    public String getRepositoryName() {
+    public String getMapperName() {
         if (Objects.nonNull(this.repositoryName)) {
             return this.repositoryName;
         }
         return getModelName() + "Repository";
     }
 
-    public String getRepositoryPackage() {
-        if (Objects.nonNull(this.repositoryPackage)) {
-            return this.repositoryPackage;
+    public String getMapperPackage() {
+        if (Objects.nonNull(this.mapperPackage)) {
+            return this.mapperPackage;
         }
         ArrayList<String> items = new ArrayList<>(Splitter.on(".").splitToList(getModelPackage()));
         items.remove(items.size() - 1);
-        items.add(items.size(), "repository");
+        items.add(items.size(), "mapper");
         return Joiner.on(".").join(items);
     }
 
-    public List<String> getRepositoryImportTypes() {
+    public List<String> getMapperImportTypes() {
         Set<String> importTypes = new TreeSet<>();
-        importTypes.add(getRepositoryExtendType().getName());
+        importTypes.add(getMapperExtendType().getName());
         importTypes.add(String.join(".", getModelPackage(), getModelName()));
         return new ArrayList<>(importTypes);
     }
 
     @SuppressWarnings("rawtypes")
-    public Class getRepositoryExtendType() {
+    public Class getMapperExtendType() {
         for (Class type : getModelImplementTypes()) {
             if (Treeable.class == type) {
                 return TreeableMapper.class;
@@ -213,8 +221,8 @@ public class DataModel {
         return BaseMapper.class;
     }
 
-    public String getRepositoryExtends() {
-        return getRepositoryExtendType().getSimpleName() + "<" + getModelName() + "," + getPrimaryKey().getJavaType().getSimpleName() + ">";
+    public String getMapperExtends() {
+        return getMapperExtendType().getSimpleName() + "<" + getModelName() + ">";
     }
 
     public String getServiceName() {
@@ -237,7 +245,7 @@ public class DataModel {
     public List<String> getServiceImportTypes() {
         Set<String> importTypes = new TreeSet<>();
         importTypes.add(getServiceExtendType().getName());
-        importTypes.add(String.join(".", getRepositoryPackage(), getRepositoryName()));
+        importTypes.add(String.join(".", getMapperPackage(), getMapperName()));
         importTypes.add(String.join(".", getModelPackage(), getModelName()));
         return new ArrayList<>(importTypes);
     }
@@ -253,6 +261,6 @@ public class DataModel {
     }
 
     public String getServiceExtends() {
-        return getServiceExtendType().getSimpleName() + "<" + getRepositoryName() + "," + getModelName() + "," + getPrimaryKey().getJavaType().getSimpleName() + ">";
+        return getServiceExtendType().getSimpleName() + "<" + getModelName() + "," + getMapperName() + ">";
     }
 }

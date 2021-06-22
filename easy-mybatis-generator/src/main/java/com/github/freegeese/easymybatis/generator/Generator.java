@@ -1,16 +1,12 @@
 package com.github.freegeese.easymybatis.generator;
 
 import com.github.freegeese.easymybatis.generator.util.FileReplacer;
-import com.google.common.base.Preconditions;
+import com.github.freegeese.easymybatis.generator.util.FreemarkerUtils;
 import com.google.common.base.Splitter;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
@@ -23,12 +19,7 @@ import java.util.Objects;
  * @since 1.0
  */
 @Slf4j
-public class CodeGenerator {
-    /**
-     * 模板配置
-     */
-    private Configuration templateConfiguration;
-
+public class Generator {
     /**
      * 是否覆盖已存在的文件
      */
@@ -44,25 +35,21 @@ public class CodeGenerator {
      */
     private String keepMarkEnd;
 
-    private CodeGenerator(Configuration templateConfiguration) {
-        this.templateConfiguration = Preconditions.checkNotNull(templateConfiguration);
+    public static Generator create() {
+        return new Generator();
     }
 
-    public static CodeGenerator create(Configuration templateConfiguration) {
-        return new CodeGenerator(templateConfiguration);
-    }
-
-    public CodeGenerator override(boolean override) {
+    public Generator override(boolean override) {
         this.override = override;
         return this;
     }
 
-    public CodeGenerator keepMarkStart(String keepMarkStart) {
+    public Generator keepMarkStart(String keepMarkStart) {
         this.keepMarkStart = keepMarkStart;
         return this;
     }
 
-    public CodeGenerator keepMarkEnd(String keepMarkEnd) {
+    public Generator keepMarkEnd(String keepMarkEnd) {
         this.keepMarkEnd = keepMarkEnd;
         return this;
     }
@@ -82,10 +69,7 @@ public class CodeGenerator {
         }
 
         // 数据 + 模板 = 内容
-        final Template ftl = getTemplate(template);
-        final StringWriter writer = new StringWriter();
-        process(dataModel, ftl, writer);
-        final String content = writer.toString();
+        String content = FreemarkerUtils.parse(dataModel, template);
 
         // 输出文件不存在的情况
         if (!output.exists()) {
@@ -119,22 +103,6 @@ public class CodeGenerator {
                     .keepMarkEnd(this.keepMarkEnd)
                     .replace(output, newLines, -2);
             Files.write(output.toPath(), mergedLines, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void process(Object dataModel, Template template, Writer writer) {
-        try {
-            template.process(dataModel, writer);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Template getTemplate(String name) {
-        try {
-            return templateConfiguration.getTemplate(name);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

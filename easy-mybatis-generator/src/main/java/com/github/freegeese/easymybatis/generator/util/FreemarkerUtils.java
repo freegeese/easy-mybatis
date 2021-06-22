@@ -10,7 +10,7 @@ import java.util.UUID;
 /**
  * Freemarker 模板解析工具
  */
-public class FreemarkerParser {
+public abstract class FreemarkerUtils {
     private static Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
 
     static {
@@ -19,11 +19,7 @@ public class FreemarkerParser {
         cfg.setWrapUncheckedExceptions(true);
     }
 
-    public static FreemarkerParser create() {
-        return new FreemarkerParser();
-    }
-
-    public String parse(Object data, String template) {
+    public static String parse(Object data, String template) {
         String name = UUID.randomUUID().toString() + System.currentTimeMillis();
         StringTemplateLoader loader = (StringTemplateLoader) cfg.getTemplateLoader();
         try {

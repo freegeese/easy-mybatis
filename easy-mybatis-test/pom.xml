@@ -83,12 +83,6 @@
         <dependency>
             <groupId>com.github.binarywang</groupId>
             <artifactId>java-testdata-generator</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
     </dependencies>

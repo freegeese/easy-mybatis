@@ -1,15 +1,11 @@
 package com.github.freegeese.easymybatis.generator.mybatis;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import freemarker.template.TemplateModelException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
-
-import static freemarker.template.Configuration.VERSION_2_3_28;
 
 /**
  * 配置信息
@@ -18,7 +14,7 @@ import static freemarker.template.Configuration.VERSION_2_3_28;
  * @since 1.0
  */
 @Data
-public class Configuration {
+public class MybatisConfiguration {
     @Data
     public static class ExtProperty {
         private Dateable dateable = new Dateable();
@@ -64,16 +60,6 @@ public class Configuration {
     private String schemaPattern;
 
     /**
-     * 模板目录
-     */
-    private File templateDirectory;
-
-    /**
-     * 模板配置
-     */
-    private freemarker.template.Configuration templateConfiguration;
-
-    /**
      * 实体生成配置
      */
     private GenerateJava model;
@@ -81,7 +67,7 @@ public class Configuration {
     /**
      * 数据库操作接口代码生成配置
      */
-    private GenerateJava repository;
+    private GenerateJava mapper;
 
     /**
      * 基础服务层代码生成配置
@@ -91,12 +77,7 @@ public class Configuration {
     /**
      * 数据库SQL代码生成配置
      */
-    private GenerateXml repositorySql;
-
-    /**
-     * 自定义数据库SQL代码生成配置
-     */
-    private GenerateXml repositoryCustomSql;
+    private GenerateXml mapperXml;
 
     /**
      * 保留标记开始
@@ -117,42 +98,6 @@ public class Configuration {
      * 数据库表配置
      */
     private List<Table> tables;
-
-    /**
-     * 设置模板目录
-     *
-     * @param templateDirectory
-     */
-    public void setTemplateDirectory(File templateDirectory) {
-        if (Objects.isNull(templateDirectory)) {
-            return;
-        }
-        try {
-            this.templateDirectory = templateDirectory;
-            freemarker.template.Configuration templateConfiguration = new freemarker.template.Configuration(VERSION_2_3_28);
-            templateConfiguration.setDirectoryForTemplateLoading(templateDirectory);
-            setTemplateConfiguration(templateConfiguration);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * 设置模板配置信息
-     *
-     * @param templateConfiguration
-     */
-    public void setTemplateConfiguration(freemarker.template.Configuration templateConfiguration) {
-        if (Objects.isNull(templateConfiguration)) {
-            return;
-        }
-        this.templateConfiguration = templateConfiguration;
-        try {
-            this.templateConfiguration.setSharedVariable("configuration", this);
-        } catch (TemplateModelException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Data
     public static class Jdbc {
@@ -202,17 +147,16 @@ public class Configuration {
     @Data
     public static class Template {
         private File outputDirectory;
-        private String template;
+        private String name;
     }
 
     @Data
     public static class Table {
         private String tableName;
         private String modelName;
-        private String repositoryName;
+        private String mapperName;
         private String serviceName;
-        private String repositorySqlName;
-        private String customRepositorySqlName;
+        private String mapperXmlName;
         private List<Column> columns;
         private List<String> extTypes;
 
@@ -248,4 +192,28 @@ public class Configuration {
 
     }
 
+    MybatisConfiguration postConstruct() {
+        if (Objects.nonNull(model)) {
+            model.setName("model.ftl");
+        }
+        if (Objects.nonNull(mapper)) {
+            mapper.setName("mapper.ftl");
+        }
+        if (Objects.nonNull(mapperXml)) {
+            mapperXml.setName("mapperXml.ftl");
+        }
+        if (Objects.nonNull(service)) {
+            service.setName("service.ftl");
+        }
+        if (Objects.isNull(extProperty)) {
+            setExtProperty(new ExtProperty());
+        }
+        if (Objects.isNull(keepMarkStart)) {
+            setKeepMarkStart("KEEP_MARK_START");
+        }
+        if (Objects.isNull(keepMarkEnd)) {
+            setKeepMarkEnd("KEEP_MARK_END");
+        }
+        return this;
+    }
 }
