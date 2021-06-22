@@ -13,7 +13,7 @@ logging:
   level:
     root: info
     org.springframework.data: debug
-    com.github: debug
+    com.github.greegeese: debug
   file:
     path: logs
     name: ${spring.application.name}.log

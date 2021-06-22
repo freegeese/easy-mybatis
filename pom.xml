@@ -61,11 +61,15 @@
         <fastjson.version>1.2.76</fastjson.version>
         <lombok.version>1.18.20</lombok.version>
         <junit.version>5.8.0-M1</junit.version>
-        <slf4j.version>2.0.0-alpha1</slf4j.version>
+        <slf4j.version>1.7.31</slf4j.version>
         <freemarker.version>2.3.31</freemarker.version>
+        <hibernate.version>5.5.2.Final</hibernate.version>
+        <druid-spring-boot-starter.version>1.2.5</druid-spring-boot-starter.version>
+        <mysql-connector-java.version>5.1.48</mysql-connector-java.version>
+        <mybatis-spring-boot-starter.version>2.2.0</mybatis-spring-boot-starter.version>
+        <java-testdata-generator.version>1.1.2</java-testdata-generator.version>
 
         <spring-boot-maven-plugin.version>2.5.1</spring-boot-maven-plugin.version>
-
         <maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
         <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -93,6 +97,16 @@
             <dependency>
                 <groupId>com.github.freegeese</groupId>
                 <artifactId>easy-mybatis-spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.freegeese</groupId>
+                <artifactId>easy-mybatis-spring-boot-starter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.freegeese</groupId>
+                <artifactId>easy-mybatis-generator</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -161,6 +175,39 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
                 <version>${slf4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${hibernate.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis-spring-boot-starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid-spring-boot-starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-connector-java.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>java-testdata-generator</artifactId>
+                <version>${java-testdata-generator.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.guava</groupId>
+                        <artifactId>guava</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -396,5 +443,6 @@
         <module>easy-mybatis-spring</module>
         <module>easy-mybatis-spring-boot-starter</module>
         <module>easy-mybatis-generator</module>
+        <module>easy-mybatis-test</module>
     </modules>
 </project>
