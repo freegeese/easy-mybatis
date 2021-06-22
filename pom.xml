@@ -384,6 +384,8 @@
         <profile>
             <!-- 发布(mvn -T 1C clean deploy -e -P release) -->
             <id>release</id>
+
+            <!-- 配置插件 -->
             <build>
                 <plugins>
                     <!-- GPG -->
@@ -414,7 +416,7 @@
                 </plugins>
             </build>
 
-            <!-- mvn clean deploy -e -P release -->
+            <!-- 发布地址 -->
             <distributionManagement>
                 <snapshotRepository>
                     <id>oss</id>
@@ -436,7 +438,7 @@
         修改版本
         mvn versions:set -DnewVersion=1.0.0-SNAPSHOT -DprocessAllModules=true -DallowSnapshots=true -DgenerateBackupPoms=false
         发布
-        mvn -T 1C clean deploy -e -P release
+        mvn -f deploy-pom.xml -T 1C clean deploy -e -P release
     -->
     <modules>
         <module>easy-mybatis-core</module>

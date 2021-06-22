@@ -84,7 +84,6 @@
             <groupId>com.github.binarywang</groupId>
             <artifactId>java-testdata-generator</artifactId>
         </dependency>
-
     </dependencies>
 
 </project>
