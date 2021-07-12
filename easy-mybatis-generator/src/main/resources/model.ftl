@@ -14,18 +14,17 @@ import lombok.Data;
 public class ${modelName} implements ${modelImplements} {
 <#-- fields -->
 <#list columns as column>
+    <#if primaryKey?? && primaryKey.name == column.name>
+    @Id
+        <#if primaryKey.autoincrement??>
+    @GeneratedValue(strategy = GenerationType.AUTO)
+        </#if>
+    </#if>
     <#if column.remarks?length gt 1>
     // ${column.remarks}
     </#if>
-    <#if primaryKey?? && primaryKey.name == column.name>
-    @Id
-    <#if primaryKey.autoincrement??>
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    </#if>
-    </#if>
     private ${column.javaType.simpleName} ${column.property};
 </#list>
-
 <#-- ext property -->
 <#if overriddenExtPropertyMap?? && (overriddenExtPropertyMap?size>0)>
     <#list overriddenExtPropertyMap?keys as key>

@@ -16,7 +16,7 @@
     "driver": "com.mysql.jdbc.Driver",
     "url": "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true",
     "user": "root",
-    "password": "123456"
+    "password": ""
   },
   "catalog": "test",
   "schemaPattern": "test",
