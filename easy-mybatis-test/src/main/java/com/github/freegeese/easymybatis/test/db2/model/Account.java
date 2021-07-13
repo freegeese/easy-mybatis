@@ -1,4 +1,4 @@
-package com.github.freegeese.easymybatis.test.db2.domain;
+package com.github.freegeese.easymybatis.test.db2.model;
 
 
 import com.github.freegeese.easymybatis.core.annotation.GeneratedValue;

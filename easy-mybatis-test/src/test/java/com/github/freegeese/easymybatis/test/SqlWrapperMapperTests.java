@@ -2,8 +2,8 @@ package com.github.freegeese.easymybatis.test;
 
 import com.github.freegeese.easymybatis.core.criterion.Option;
 import com.github.freegeese.easymybatis.core.criterion.SqlWrapper;
-import com.github.freegeese.easymybatis.test.db1.domain.User;
 import com.github.freegeese.easymybatis.test.db1.mapper.UserMapper;
+import com.github.freegeese.easymybatis.test.db1.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,7 +1,7 @@
 package com.github.freegeese.easymybatis.test;
 
-import com.github.freegeese.easymybatis.test.db2.domain.Account;
 import com.github.freegeese.easymybatis.test.db2.mapper.AccountMapper;
+import com.github.freegeese.easymybatis.test.db2.model.Account;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

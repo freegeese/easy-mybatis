@@ -4,7 +4,7 @@ import cn.binarywang.tools.generator.ChineseMobileNumberGenerator;
 import cn.binarywang.tools.generator.ChineseNameGenerator;
 import com.github.freegeese.easymybatis.core.domain.Pageable;
 import com.github.freegeese.easymybatis.core.domain.Pagination;
-import com.github.freegeese.easymybatis.test.db1.domain.User;
+import com.github.freegeese.easymybatis.test.db1.model.User;
 import com.github.freegeese.easymybatis.test.db1.service.UserService;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;

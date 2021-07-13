@@ -2,7 +2,7 @@ package com.github.freegeese.easymybatis.test.criterion;
 
 import com.github.freegeese.easymybatis.core.criterion.Option;
 import com.github.freegeese.easymybatis.core.criterion.SqlWrapper;
-import com.github.freegeese.easymybatis.test.db1.domain.User;
+import com.github.freegeese.easymybatis.test.db1.model.User;
 import com.google.common.base.Strings;
 import org.junit.jupiter.api.Test;
 

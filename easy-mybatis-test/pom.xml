@@ -35,6 +35,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.github.freegeese</groupId>
+            <artifactId>easy-mybatis-generator</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
