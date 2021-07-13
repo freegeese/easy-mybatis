@@ -153,7 +153,6 @@ public class DataModel {
      *
      * @return
      */
-    @SuppressWarnings("rawtypes")
     public List<Class> getModelImplementTypes() {
         if (Objects.isNull(this.extTypes) || this.extTypes.isEmpty()) {
             return null;
@@ -184,14 +183,17 @@ public class DataModel {
     }
 
     public String getModelImplements() {
-        return getModelImplementTypes().stream().map(Class::getSimpleName).collect(Collectors.joining(","));
+        return getModelImplementTypes().stream().map(v -> {
+            String simpleName = v.getSimpleName();
+            return v == Treeable.class ? simpleName + "<" + getPrimaryKey().getJavaType().getSimpleName() + ">" : simpleName;
+        }).collect(Collectors.joining(", "));
     }
 
     public String getMapperName() {
         if (Objects.nonNull(this.repositoryName)) {
             return this.repositoryName;
         }
-        return getModelName() + "Repository";
+        return getModelName() + "Mapper";
     }
 
     public String getMapperPackage() {
@@ -222,7 +224,12 @@ public class DataModel {
     }
 
     public String getMapperExtends() {
-        return getMapperExtendType().getSimpleName() + "<" + getModelName() + ">";
+        Class extendType = getMapperExtendType();
+        String simpleName = extendType.getSimpleName();
+        if (extendType == TreeableMapper.class) {
+            return simpleName + "<" + String.join(", ", getModelName(), getPrimaryKey().getJavaType().getSimpleName()) + ">";
+        }
+        return simpleName + "<" + getModelName() + ">";
     }
 
     public String getServiceName() {
@@ -250,7 +257,6 @@ public class DataModel {
         return new ArrayList<>(importTypes);
     }
 
-    @SuppressWarnings("rawtypes")
     public Class getServiceExtendType() {
         for (Class type : getModelImplementTypes()) {
             if (Treeable.class == type) {
@@ -261,6 +267,11 @@ public class DataModel {
     }
 
     public String getServiceExtends() {
-        return getServiceExtendType().getSimpleName() + "<" + getModelName() + "," + getMapperName() + ">";
+        Class extendType = getServiceExtendType();
+        String simpleName = extendType.getSimpleName();
+        if (extendType == TreeableService.class) {
+            return simpleName + "<" + String.join(", ", getModelName(), getMapperName(), getPrimaryKey().getJavaType().getSimpleName()) + ">";
+        }
+        return simpleName + "<" + String.join(", ", getModelName(), getMapperName()) + ">";
     }
 }

@@ -46,9 +46,10 @@
   },
   "tables": [
     {
-      "tableName": "user",
+      "tableName": "category",
       "extTypes": [
-        "Dateable"
+        "Dateable",
+        "Treeable"
       ]
     }
   ]
