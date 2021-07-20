@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+
 @SpringBootTest
 class SqlWrapperMapperTests {
 
@@ -16,7 +18,7 @@ class SqlWrapperMapperTests {
 
     @Test
     void testSelect() {
-        mapper.selectByWrapper(
+        List<User> users = mapper.selectByWrapper(
                 SqlWrapper
                         .select(User::getId, User::getName, User::getPhone)
                         .where(User::getId, Option.gt, 1000)
@@ -24,6 +26,9 @@ class SqlWrapperMapperTests {
                         .and(User::getName, Option.fullLike.not(), "张")
                         .unwrap()
         );
+        for (User user : users) {
+            System.out.println(user.getName());
+        }
     }
 
     @Test
