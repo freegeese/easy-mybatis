@@ -1,5 +1,6 @@
 package com.github.freegeese.easymybatis.spring.service;
 
+import com.github.freegeese.easymybatis.core.criterion.SqlWrapper;
 import com.github.freegeese.easymybatis.core.domain.Pageable;
 import com.github.freegeese.easymybatis.core.mapper.BaseMapper;
 import com.github.pagehelper.PageHelper;
@@ -116,6 +117,10 @@ public abstract class BaseService<T, M extends BaseMapper<T>> {
         return mapper.selectByParameterMap(parameterMap);
     }
 
+    public List<T> selectByWrapper(SqlWrapper wrapper) {
+        return mapper.selectByWrapper(wrapper.unwrap());
+    }
+
     public List<T> selectAll() {
         return mapper.selectAll();
     }
@@ -137,7 +142,11 @@ public abstract class BaseService<T, M extends BaseMapper<T>> {
         return copyPageInfo(page, PageHelper.offsetPage(page.getOffset(), page.getPageSize()).doSelectPageInfo(() -> mapper.selectByParameterMap(parameterMap)));
     }
 
-    private Pageable copyPageInfo(Pageable page, PageInfo<T> pageInfo) {
+    public Pageable selectPageByWrapper(Pageable page, SqlWrapper wrapper) {
+        return copyPageInfo(page, PageHelper.offsetPage(page.getOffset(), page.getPageSize()).doSelectPageInfo(() -> mapper.selectByWrapper(wrapper.unwrap())));
+    }
+
+    protected Pageable copyPageInfo(Pageable page, PageInfo<T> pageInfo) {
         page.setTotalRecords(pageInfo.getTotal());
         page.setContent(pageInfo.getList());
         return page;
