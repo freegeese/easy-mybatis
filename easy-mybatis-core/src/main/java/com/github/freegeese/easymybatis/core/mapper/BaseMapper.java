@@ -13,5 +13,6 @@ public interface BaseMapper<T> extends
         SelectMapper<T>,
         InsertMapper<T>,
         UpdateMapper<T>,
-        DeleteMapper<T> {
+        DeleteMapper<T>,
+        SqlWrapperMapper<T> {
 }
