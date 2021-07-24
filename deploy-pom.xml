@@ -74,6 +74,7 @@
         <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
+        <maven-dependency-plugin.version>3.2.0</maven-dependency-plugin.version>
         <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <maven-javadoc-plugin.version>3.3.0</maven-javadoc-plugin.version>
@@ -251,6 +252,10 @@
                 <plugin>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>${maven-deploy-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${maven-dependency-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
@@ -431,7 +436,7 @@
 
     <!--
         修改版本
-        mvn versions:set -DnewVersion=1.0.0-alpha0 -DprocessAllModules=true -DallowSnapshots=true -DgenerateBackupPoms=false
+        mvn versions:set -DnewVersion=1.0.0-alpha1 -DprocessAllModules=true -DallowSnapshots=true -DgenerateBackupPoms=false
         发布
         mvn -f deploy-pom.xml -T 1C clean deploy -e -P release
     -->
@@ -440,6 +445,5 @@
         <module>easy-mybatis-spring</module>
         <module>easy-mybatis-spring-boot-starter</module>
         <module>easy-mybatis-generator</module>
-        <module>easy-mybatis-test</module>
     </modules>
 </project>
