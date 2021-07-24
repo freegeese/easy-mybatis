@@ -8,11 +8,13 @@ import com.github.freegeese.easymybatis.core.domain.Pagination;
 import com.github.freegeese.easymybatis.test.db1.mapper.UserMapper;
 import com.github.freegeese.easymybatis.test.db1.model.User;
 import com.github.freegeese.easymybatis.test.db1.service.UserService;
+import com.google.common.collect.Maps;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.Map;
 
 @SpringBootTest
 class SqlWrapperMapperTests {
@@ -75,5 +77,14 @@ class SqlWrapperMapperTests {
 
         Pageable pageable = service.selectPageByWrapper(pagination, wrapper);
         System.out.println(JSON.toJSONString(pageable, true));
+    }
+
+    @Test
+    void testParameterMap() {
+        Map<String, Object> conditions = Maps.newHashMap();
+        conditions.put("name", " like '%张%'");
+        List<User> users = service.selectByParameterMap(conditions);
+        System.out.println(users.size());
+
     }
 }

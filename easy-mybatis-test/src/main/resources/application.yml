@@ -12,8 +12,7 @@ spring:
 logging:
   level:
     root: info
-    org.springframework.data: debug
-    com.github.greegeese: debug
+    com.github.freegeese.easymybatis.test.db1.mapper: debug
   file:
     path: logs
     name: ${spring.application.name}.log
